@@ -9,5 +9,7 @@
   "NoEscalation.Sanity":
   ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Sanity.olean"],
   "NoEscalation.Kernel":
-  ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Kernel.olean"]},
+  ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Kernel.olean"],
+  "NoEscalation.Guarded":
+  ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Guarded.olean"]},
  "dynlibs": []}

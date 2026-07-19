@@ -1,1 +1,1 @@
-{"decls":{},"directImports":[["NoEscalation.Kernel",false,false,false],["NoEscalation.Semantics",false,false,false],["NoEscalation.Sanity",false,false,false]],"module":"NoEscalation","references":{},"version":5}
+{"decls":{},"directImports":[["NoEscalation.Kernel",false,false,false],["NoEscalation.Semantics",false,false,false],["NoEscalation.Sanity",false,false,false],["NoEscalation.Guarded",false,false,false]],"module":"NoEscalation","references":{},"version":5}

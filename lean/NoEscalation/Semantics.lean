@@ -166,10 +166,12 @@ structure InitOK (cfg : Config E Comp) : Prop where
   -- almost certainly too strong or too weak. Revising it IS the work.
 
 /--
-PHASE-TWO OBJECTIVE (v1.0 §8, target theorem): under the initial
-conditions, no reachable step escalates. The proof requires the chain-level
-strengthening of NES_T; expect `InitOK` and the invariant to co-evolve.
-This is the project's central theorem and the only intended `sorry`.
+RETRACTED (v1.0 → v1.1). This target — `InitOK → NE` — is FALSE. Refuted by
+`Sanity.composition_target_unprovable`: the B2 shape satisfies InitOK yet
+reaches an NE violation, because untrusted `perform` steps carry no check.
+The corrected target is `Guarded.T2_mixed_composition` (see Guarded.lean),
+stated over the two-semantics hybrid with the mediation assumption A5.
+Kept here, sorry'd, as provenance — do NOT attempt to prove it.
 -/
 theorem composition_target {init : Config E Comp} (h : InitOK init) :
     NE init := by

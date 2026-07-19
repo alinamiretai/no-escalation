@@ -1,10 +1,10 @@
 {"synthetic": false,
  "schemaVersion": "2025-09-10",
  "outputs":
- {"o": ["7d38d0645217ee79.olean"],
+ {"o": ["574a6891f71af126.olean"],
   "m": false,
-  "i": "d48aff6da9c73e2e.ilean",
-  "c": "78c04a6a930d6565.c"},
+  "i": "ac40a8f09ab0efb7.ilean",
+  "c": "395817fd032474ca.c"},
  "log":
  [{"message":
    ".> LEAN_PATH=/Users/alinashah/no-escalation/lean/.lake/build/lib/lean /Users/alinashah/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean /Users/alinashah/no-escalation/lean/NoEscalation.lean -o /Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation.olean -i /Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation.ilean -c /Users/alinashah/no-escalation/lean/.lake/build/ir/NoEscalation.c --setup /Users/alinashah/no-escalation/lean/.lake/build/ir/NoEscalation.setup.json --json",
@@ -19,9 +19,12 @@
         ["NoEscalation.Kernel:importAllArts", "add3f483f4ea6a9e"],
         ["NoEscalation.Semantics transitive imports (legacy)",
          "95faf278ea9e2c9a"],
-        ["NoEscalation.Semantics:importAllArts", "07e475170254265d"],
-        ["NoEscalation.Sanity transitive imports (legacy)", "bf2223ffbfefffb9"],
-        ["NoEscalation.Sanity:importAllArts", "8c39d4d88e11f574"]]]]],
+        ["NoEscalation.Semantics:importAllArts", "264510452fde6f98"],
+        ["NoEscalation.Sanity transitive imports (legacy)", "8b1838785e9af2f4"],
+        ["NoEscalation.Sanity:importAllArts", "8c39d4d88e11f574"],
+        ["NoEscalation.Guarded transitive imports (legacy)",
+         "8b1838785e9af2f4"],
+        ["NoEscalation.Guarded:importAllArts", "341dbeb5dfc923e6"]]]]],
     ["libs",
      [["import dynlibs", "00000000000006bb"],
       ["package external libraries", "00000000000006bb"],
@@ -29,10 +32,10 @@
       ["module plugins", "00000000000006bb"]]]]],
   ["Lean 4.32.0, commit 8c9756b28d64dab099da31a4c09229a9e6a2ef35",
    "5d4a267a1ba5cafb"],
-  ["/Users/alinashah/no-escalation/lean/NoEscalation.lean", "62c52a636c965cde"],
+  ["/Users/alinashah/no-escalation/lean/NoEscalation.lean", "5fc318acd032b3a6"],
   ["options", "00000000000006bb"],
   ["isModule: false", "feefd2a0d3a1847e"],
   ["Module.name: NoEscalation", "e9b65ac67c3dade7"],
   ["Package.id?: (some NoEscalation)", "c4ea5af0b400fe0e"],
   ["Module.leanArgs: #[]", "00000000000006bb"]],
- "depHash": "02e02a74e3081335"}
+ "depHash": "c3ba18b0d6233c61"}
