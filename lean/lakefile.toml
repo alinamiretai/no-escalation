@@ -1,0 +1,5 @@
+name = "NoEscalation"
+defaultTargets = ["NoEscalation"]
+
+[[lean_lib]]
+name = "NoEscalation"
