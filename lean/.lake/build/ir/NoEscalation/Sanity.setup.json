@@ -1,13 +1,11 @@
 {"plugins": [],
  "package": "NoEscalation",
  "options": {},
- "name": "NoEscalation",
+ "name": "NoEscalation.Sanity",
  "isModule": false,
  "importArts":
  {"NoEscalation.Semantics":
   ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Semantics.olean"],
-  "NoEscalation.Sanity":
-  ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Sanity.olean"],
   "NoEscalation.Kernel":
   ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Kernel.olean"]},
  "dynlibs": []}
