@@ -1,10 +1,10 @@
 {"synthetic": false,
  "schemaVersion": "2025-09-10",
  "outputs":
- {"o": ["574a6891f71af126.olean"],
+ {"o": ["b6b24febc5c9fd51.olean"],
   "m": false,
-  "i": "ac40a8f09ab0efb7.ilean",
-  "c": "395817fd032474ca.c"},
+  "i": "32a186d459417ab7.ilean",
+  "c": "119b8d2217c9bb49.c"},
  "log":
  [{"message":
    ".> LEAN_PATH=/Users/alinashah/no-escalation/lean/.lake/build/lib/lean /Users/alinashah/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean /Users/alinashah/no-escalation/lean/NoEscalation.lean -o /Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation.olean -i /Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation.ilean -c /Users/alinashah/no-escalation/lean/.lake/build/ir/NoEscalation.c --setup /Users/alinashah/no-escalation/lean/.lake/build/ir/NoEscalation.setup.json --json",
@@ -24,7 +24,12 @@
         ["NoEscalation.Sanity:importAllArts", "8c39d4d88e11f574"],
         ["NoEscalation.Guarded transitive imports (legacy)",
          "8b1838785e9af2f4"],
-        ["NoEscalation.Guarded:importAllArts", "8fb025d96eadd1f0"]]]]],
+        ["NoEscalation.Guarded:importAllArts", "8fb025d96eadd1f0"],
+        ["NoEscalation.Warmups transitive imports (legacy)",
+         "c3e463d1c9f00a33"],
+        ["NoEscalation.Warmups:importAllArts", "1d18f55ba032f2a7"],
+        ["NoEscalation.Alias transitive imports (legacy)", "454d77cc799c5cef"],
+        ["NoEscalation.Alias:importAllArts", "05627553943ba9b7"]]]]],
     ["libs",
      [["import dynlibs", "00000000000006bb"],
       ["package external libraries", "00000000000006bb"],
@@ -32,10 +37,10 @@
       ["module plugins", "00000000000006bb"]]]]],
   ["Lean 4.32.0, commit 8c9756b28d64dab099da31a4c09229a9e6a2ef35",
    "5d4a267a1ba5cafb"],
-  ["/Users/alinashah/no-escalation/lean/NoEscalation.lean", "5fc318acd032b3a6"],
+  ["/Users/alinashah/no-escalation/lean/NoEscalation.lean", "c4798ffe01005b99"],
   ["options", "00000000000006bb"],
   ["isModule: false", "feefd2a0d3a1847e"],
   ["Module.name: NoEscalation", "e9b65ac67c3dade7"],
   ["Package.id?: (some NoEscalation)", "c4ea5af0b400fe0e"],
   ["Module.leanArgs: #[]", "00000000000006bb"]],
- "depHash": "1724bdf31e7feb3d"}
+ "depHash": "689eb8e5586f2cc8"}

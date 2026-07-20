@@ -1,19 +1,15 @@
 {"plugins": [],
  "package": "NoEscalation",
  "options": {},
- "name": "NoEscalation",
+ "name": "NoEscalation.Alias",
  "isModule": false,
  "importArts":
  {"NoEscalation.Warmups":
   ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Warmups.olean"],
   "NoEscalation.Semantics":
   ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Semantics.olean"],
-  "NoEscalation.Sanity":
-  ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Sanity.olean"],
   "NoEscalation.Kernel":
   ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Kernel.olean"],
   "NoEscalation.Guarded":
-  ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Guarded.olean"],
-  "NoEscalation.Alias":
-  ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Alias.olean"]},
+  ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Guarded.olean"]},
  "dynlibs": []}
