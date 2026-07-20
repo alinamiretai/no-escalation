@@ -1,7 +1,0 @@
-{"plugins": [],
- "package": "NoEscalation",
- "options": {},
- "name": "NoEscalation.Kernel",
- "isModule": false,
- "importArts": {},
- "dynlibs": []}

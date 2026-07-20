@@ -1,9 +1,0 @@
-{"plugins": [],
- "package": "NoEscalation",
- "options": {},
- "name": "NoEscalation.Semantics",
- "isModule": false,
- "importArts":
- {"NoEscalation.Kernel":
-  ["/Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Kernel.olean"]},
- "dynlibs": []}
