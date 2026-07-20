@@ -1,16 +1,14 @@
 {"synthetic": false,
  "schemaVersion": "2025-09-10",
  "outputs":
- {"o": ["cf34946e3a600286.olean"],
+ {"o": ["85bbe0105c8eb526.olean"],
   "m": false,
-  "i": "362f28184bc7ebaf.ilean",
+  "i": "a16a88a98f4e2af0.ilean",
   "c": "b5a8c8f9d6d5a123.c"},
  "log":
  [{"message":
    ".> LEAN_PATH=/Users/alinashah/no-escalation/lean/.lake/build/lib/lean /Users/alinashah/.elan/toolchains/leanprover--lean4---v4.32.0/bin/lean /Users/alinashah/no-escalation/lean/NoEscalation/Guarded.lean -o /Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Guarded.olean -i /Users/alinashah/no-escalation/lean/.lake/build/lib/lean/NoEscalation/Guarded.ilean -c /Users/alinashah/no-escalation/lean/.lake/build/ir/NoEscalation/Guarded.c --setup /Users/alinashah/no-escalation/lean/.lake/build/ir/NoEscalation/Guarded.setup.json --json",
-   "level": "trace"},
-  {"message": "NoEscalation/Guarded.lean:138:8: declaration uses `sorry`",
-   "level": "warning"}],
+   "level": "trace"}],
  "inputs":
  [["NoEscalation.Guarded:deps",
    [["deps",
@@ -28,10 +26,10 @@
   ["Lean 4.32.0, commit 8c9756b28d64dab099da31a4c09229a9e6a2ef35",
    "5d4a267a1ba5cafb"],
   ["/Users/alinashah/no-escalation/lean/NoEscalation/Guarded.lean",
-   "9d2ecccac5ed78e2"],
+   "6841406822364e28"],
   ["options", "00000000000006bb"],
   ["isModule: false", "feefd2a0d3a1847e"],
   ["Module.name: NoEscalation.Guarded", "e9ba0dc0585bf873"],
   ["Package.id?: (some NoEscalation)", "c4ea5af0b400fe0e"],
   ["Module.leanArgs: #[]", "00000000000006bb"]],
- "depHash": "c6d96001d69def2c"}
+ "depHash": "49eaff3d6ff57b8d"}

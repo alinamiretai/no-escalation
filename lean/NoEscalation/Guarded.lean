@@ -116,28 +116,6 @@ def MNE (init : Config E Comp) : Prop :=
     ∀ p π e cfg', MStep Sys cfg (some (Ev.eff p π e)) cfg' →
       cfg.bound p e ∧ π.meet e
 
-/--
-**T2 (Mixed-system composition) — CENTERPIECE, property-note §8.**
-Under InitOK' and the mixed step discipline, every trace satisfies NE.
-
-Unlike T1, this is NOT definitional: the `trusted` constructor carries the
-Guard obligation only on the *immediate* effect, but escalation can arise
-across a chain (a trusted deputy acting for an untrusted requester, a
-caretaker resuming a captured context). The proof needs the chain-level
-strengthening of NES_T — the invariant search deferred from Semantics.lean.
-This is the project's real theorem and the intended `sorry`.
-
-Note the single-step cases already discharge:
-  • untrusted → `T1_soundness`-style: the guard gives effbound directly;
-  • trusted   → the contract hypothesis gives effbound directly.
-So the difficulty is PURELY the inductive strengthening (what must hold of
-in-flight messages and live resolvers so that every REACHABLE step's
-performer already satisfies its guard/contract). Writing that invariant is
-the work; it is deliberately not guessed here.
--/
-theorem T2_mixed_composition {init : Config E Comp}
-    (h : InitOK' init) : MNE Sys init := by
-  sorry
 
 /-- The single-step content of T2, which DOES hold definitionally — recorded
 as a lemma both to check the encoding and to be reused by the eventual
@@ -153,6 +131,27 @@ theorem MStep_guards {cfg : Config E Comp} {p π e cfg'}
       exact (hc p π e rfl).2
   -- CHECK: nested `cases` on the lifted GStep; if the implicit event unifies
   -- awkwardly, switch to `rcases`.
+
+
+/--
+**T2 (Mixed-system composition) — property-note §8, PROVED.**
+
+Proof is three lines, and that is a FINDING, not a disappointment: because
+effbound is turn-local (performer's bound + message-carried context, no
+global state), the enforcement condition is per-step, and composition of the
+enforced property is trivial BY DESIGN — the Fournet–Gordon thin-guarantee
+pattern, landed. `MStep_guards` was the whole theorem. Note `InitOK'` is not
+needed: under enforcement, NE requires no initial conditions. (The earlier
+docstring claiming "the difficulty is purely the inductive strengthening"
+was wrong — ledger entry: prose ahead of the checker errs in both
+directions. The genuine invariant work belongs to T4: alias-freedom over
+stores and in-flight payloads, a mutually-inductive pair with Membrane —
+see the T4 development.)
+-/
+theorem T2_mixed_composition (init : Config E Comp) : MNE Sys init := by
+  intro _ _ _ p π e cfg' hs
+  exact MStep_guards Sys hs
+
 
 end Guarded
 end NoEscalation
