@@ -1,0 +1,601 @@
+=== commit ===
+1338dbed4a044ee26422d4212bac3a8037fdb7ff
+=== 1. outbound HTTP clients ===
+./internal/oauth/testutil_test.go:186:	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawurl, nil)
+./internal/oauth/manager.go:372:		refreshCtx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Timeout: tokenRefreshTimeout})
+./internal/githubv4mock/githubv4mock.go:202:	return &http.Client{Transport: &localRoundTripper{
+./internal/ghmcp/server.go:76:			gogithub.WithHTTPClient(&http.Client{Transport: &transport.BearerAuthTransport{
+./internal/ghmcp/server.go:84:			gogithub.WithHTTPClient(&http.Client{Transport: restUATransport}),
+./internal/ghmcp/server.go:95:	gqlHTTPClient := &http.Client{
+./pkg/utils/api.go:205:	client := &http.Client{
+./pkg/github/helper_test.go:584:	client := &http.Client{Transport: transport}
+./pkg/github/helper_test.go:686:	return &http.Client{Transport: transport}
+./pkg/github/granular_tools_test.go:2410:		httpClient := &http.Client{
+./pkg/github/actions.go:172:	httpResp, err := http.Get(logURL) //nolint:gosec
+./pkg/github/issues_test.go:49:	return &http.Client{Transport: &repoAccessMockTransport{responses: responses}}
+./pkg/github/issues_test.go:2669:		httpClient := &http.Client{
+./pkg/github/repository_resource_test.go:292:	httpClient := &http.Client{Transport: &errorTransport{err: networkErr}}
+./pkg/github/ui_tools_test.go:71:	return &http.Client{Transport: recorderTransport{handler: mux}}
+./pkg/github/dependencies.go:350:	gqlHTTPClient := &http.Client{
+./pkg/http/transport/graphql_features_test.go:77:			req, err := http.NewRequestWithContext(ctx, http.MethodPost, server.URL, nil)
+./pkg/http/transport/graphql_features_test.go:113:	req, err := http.NewRequestWithContext(ctx, http.MethodPost, server.URL, nil)
+./pkg/http/transport/graphql_features_test.go:141:	req, err := http.NewRequestWithContext(ctx, http.MethodPost, server.URL, nil)
+./pkg/http/transport/graphql_features.go:23://	httpClient := &http.Client{
+./pkg/http/transport/bearer_test.go:65:			req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, server.URL, nil)
+./pkg/http/transport/bearer_test.go:98:		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, server.URL, nil)
+./pkg/http/transport/bearer_test.go:133:	req, err := http.NewRequestWithContext(ctx, http.MethodPost, server.URL, nil)
+./pkg/http/transport/bearer_test.go:156:	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, server.URL, nil)
+./pkg/scopes/fetcher_test.go:203:	customClient := &http.Client{Timeout: 5 * time.Second}
+./pkg/scopes/fetcher.go:47:		client = &http.Client{Timeout: DefaultFetchTimeout}
+./pkg/scopes/fetcher.go:77:	req, err := http.NewRequestWithContext(ctx, http.MethodHead, endpoint, nil)
+./pkg/raw/raw_test.go:104:			mockedClient := &http.Client{
+./pkg/raw/raw_test.go:138:	ghClient, err := github.NewClient(github.WithHTTPClient(&http.Client{}))
+=== 2. non-GitHub hosts ===
+./cmd/github-mcp-server/generate_docs.go:379:	fmt.Fprintf(&buf, "| %s<br>`default` | Default toolset | https://api.githubcopilot.com/mcp/ | [Install](https://insiders.vscode.dev/redirect/mcp/install?name=github&config=%%7B%%22type%%22%%3A%%20%%22http%%22%%2C%%22url%%22%%3A%%20%%22https%%3A%%2F%%2Fapi.githubcopilot.com%%2Fmcp%%2F%%22%%7D) | [read-only](https://api.githubcopilot.com/mcp/readonly) | [Install read-only](https://insiders.vscode.dev/redirect/mcp/install?name=github&config=%%7B%%22type%%22%%3A%%20%%22http%%22%%2C%%22url%%22%%3A%%20%%22https%%3A%%2F%%2Fapi.githubcopilot.com%%2Fmcp%%2Freadonly%%22%%7D) |\n", metaIcon)
+./cmd/github-mcp-server/generate_docs.go:380:	fmt.Fprintf(&buf, "| %s<br>`all` | All available GitHub MCP tools | https://api.githubcopilot.com/mcp/x/all | [Install](https://insiders.vscode.dev/redirect/mcp/install?name=gh-all&config=%%7B%%22type%%22%%3A%%20%%22http%%22%%2C%%22url%%22%%3A%%20%%22https%%3A%%2F%%2Fapi.githubcopilot.com%%2Fmcp%%2Fx%%2Fall%%22%%7D) | [read-only](https://api.githubcopilot.com/mcp/x/all/readonly) | [Install read-only](https://insiders.vscode.dev/redirect/mcp/install?name=gh-all&config=%%7B%%22type%%22%%3A%%20%%22http%%22%%2C%%22url%%22%%3A%%20%%22https%%3A%%2F%%2Fapi.githubcopilot.com%%2Fmcp%%2Fx%%2Fall%%2Freadonly%%22%%7D) |\n", metaIcon)
+./cmd/github-mcp-server/generate_docs.go:387:		apiURL := fmt.Sprintf("https://api.githubcopilot.com/mcp/x/%s", idStr)
+./cmd/github-mcp-server/generate_docs.go:388:		readonlyURL := fmt.Sprintf("https://api.githubcopilot.com/mcp/x/%s/readonly", idStr)
+./cmd/github-mcp-server/generate_docs.go:398:		installLink := fmt.Sprintf("[Install](https://insiders.vscode.dev/redirect/mcp/install?name=gh-%s&config=%s)", idStr, installConfig)
+./cmd/github-mcp-server/generate_docs.go:399:		readonlyInstallLink := fmt.Sprintf("[Install read-only](https://insiders.vscode.dev/redirect/mcp/install?name=gh-%s&config=%s)", idStr, readonlyConfig)
+./cmd/github-mcp-server/generate_docs.go:427:		apiURL := fmt.Sprintf("https://api.githubcopilot.com/mcp/x/%s", idStr)
+./cmd/github-mcp-server/generate_docs.go:428:		readonlyURL := fmt.Sprintf("https://api.githubcopilot.com/mcp/x/%s/readonly", idStr)
+./cmd/github-mcp-server/generate_docs.go:438:		installLink := fmt.Sprintf("[Install](https://insiders.vscode.dev/redirect/mcp/install?name=gh-%s&config=%s)", idStr, installConfig)
+./cmd/github-mcp-server/generate_docs.go:439:		readonlyInstallLink := fmt.Sprintf("[Install read-only](https://insiders.vscode.dev/redirect/mcp/install?name=gh-%s&config=%s)", idStr, readonlyConfig)
+./cmd/github-mcp-server/main.go:49:			if oauthClientID == "" && oauth.NormalizeHost(viper.GetString("host")) == "https://github.com" {
+./cmd/github-mcp-server/main.go:60:			// https://github.com/spf13/viper/issues/380
+./internal/oauth/oauth.go:68:// default host (NormalizeHost(host) == "https://github.com").
+./internal/oauth/oauth.go:72:		return "https://github.com"
+./internal/oauth/oauth.go:77:	case strings.HasPrefix(host, "https://"):
+./internal/oauth/oauth.go:78:		host = strings.TrimPrefix(host, "https://")
+./internal/githubv4mock/query.go:1:// Ths contents of this file are taken from https://github.com/shurcooL/graphql/blob/ed46e5a4646634fc16cb07c3b8db389542cc8847/query.go
+./internal/githubv4mock/query.go:4:// The original license, copied from https://github.com/shurcooL/graphql/blob/ed46e5a4646634fc16cb07c3b8db389542cc8847/LICENSE
+./internal/githubv4mock/query.go:75:		// See https://spec.graphql.org/October2021/#sec-Insignificant-Commas.
+./internal/githubv4mock/query.go:99:		if name == "string" { // HACK: Workaround for https://github.com/shurcooL/githubv4/issues/12.
+./internal/githubv4mock/local_round_tripper.go:4:// The original license, copied from https://github.com/shurcooL/graphql/blob/ed46e5a4646634fc16cb07c3b8db389542cc8847/LICENSE
+./internal/githubv4mock/objects_are_equal_values.go:1:// The contents of this file are taken from https://github.com/stretchr/testify/blob/016e2e9c269209287f33ec203f340a9a723fe22c/assert/assertions.go#L166
+./internal/githubv4mock/objects_are_equal_values.go:6:// The original license, copied from https://github.com/stretchr/testify/blob/016e2e9c269209287f33ec203f340a9a723fe22c/LICENSE
+./internal/githubv4mock/githubv4mock.go:46:		// Matching shurcooL/githubv4 mutation behaviour found in https://github.com/shurcooL/githubv4/blob/48295856cce734663ddbd790ff54800f784f3193/githubv4.go#L45-L56
+./internal/ghmcp/server.go:208:	// See: https://github.com/github/github-mcp-server?tab=readme-ov-file#tool-configuration
+./internal/ghmcp/server.go:223:	// See: https://github.com/github/github-mcp-server?tab=readme-ov-file#i18n--overriding-descriptions
+./pkg/octicons/octicons.go:2:// See https://primer.style/foundations/icons for available icons.
+./pkg/octicons/octicons.go:85:// See https://primer.style/foundations/icons for available icons.
+./pkg/utils/api.go:62:	baseRestURL, err := url.Parse("https://api.github.com/")
+./pkg/utils/api.go:67:	gqlURL, err := url.Parse("https://api.github.com/graphql")
+./pkg/utils/api.go:72:	uploadURL, err := url.Parse("https://uploads.github.com")
+./pkg/utils/api.go:77:	rawURL, err := url.Parse("https://raw.githubusercontent.com/")
+./pkg/utils/api.go:83:	authorizationServerURL, err := url.Parse("https://github.com/login/oauth")
+./pkg/utils/api.go:108:	restURL, err := url.Parse(fmt.Sprintf("https://api.%s/", u.Hostname()))
+./pkg/utils/api.go:113:	gqlURL, err := url.Parse(fmt.Sprintf("https://api.%s/graphql", u.Hostname()))
+./pkg/utils/api.go:118:	uploadURL, err := url.Parse(fmt.Sprintf("https://uploads.%s/", u.Hostname()))
+./pkg/utils/api.go:123:	rawURL, err := url.Parse(fmt.Sprintf("https://raw.%s/", u.Hostname()))
+./pkg/utils/api.go:128:	authorizationServerURL, err := url.Parse(fmt.Sprintf("https://%s/login/oauth", u.Hostname()))
+./pkg/utils/api.go:159:	// See https://docs.github.com/en/enterprise-server@3.17/admin/configuring-settings/hardening-security-for-your-enterprise/enabling-subdomain-isolation#about-subdomain-isolation
+./pkg/utils/api.go:164:		// With subdomain isolation: https://uploads.hostname/
+./pkg/utils/api.go:167:		// Without subdomain isolation: https://hostname/api/uploads/
+./pkg/utils/api.go:176:		// With subdomain isolation: https://raw.hostname/
+./pkg/utils/api.go:179:		// Without subdomain isolation: https://hostname/raw/
+./pkg/github/params.go:326:// https://docs.github.com/en/rest/using-the-rest-api/using-pagination-in-the-rest-api
+./pkg/github/ui_resources.go:15:// https://github.com/modelcontextprotocol/ext-apps/blob/main/specification/2026-01-26/apps.mdx
+./pkg/github/ui_resources.go:37:									"resourceDomains": []string{"https://avatars.githubusercontent.com"},
+./pkg/github/server.go:30:	// See: https://github.com/github/github-mcp-server?tab=readme-ov-file#tool-configuration
+./pkg/github/issues.go:1765:// URL of the form https://api.github.com/repos/{owner}/{repo}.
+./pkg/github/copilot.go:161:			"https://docs.github.com/en/copilot/using-github-copilot/using-copilot-coding-agent-to-work-on-tasks/about-assigning-tasks-to-copilot",
+./pkg/github/copilot.go:276:				return utils.NewToolResultError("copilot isn't available as an assignee for this issue. Please inform the user to visit https://docs.github.com/en/copilot/using-github-copilot/using-copilot-coding-agent-to-work-on-tasks/about-assigning-tasks-to-copilot for more information."), nil, nil
+./pkg/github/tools.go:20:// Icons are Octicon names from https://primer.style/foundations/icons
+./pkg/github/repositories.go:2497:// https://docs.github.com/en/graphql/reference/objects#blamerange
+./pkg/http/server.go:60:	// See: https://github.com/github/github-mcp-server?tab=readme-ov-file#i18n--overriding-descriptions
+./pkg/http/oauth/oauth.go:83:		apiHost, err = utils.NewAPIHost("https://api.github.com")
+./pkg/lockdown/lockdown.go:284:	// https://docs.github.com/en/rest/collaborators/collaborators#get-repository-permissions-for-a-user
+./pkg/inventory/server_tool.go:39:	// See https://primer.style/foundations/icons for available icons.
+./pkg/scopes/scopes.go:10:// See https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/scopes-for-oauth-apps
+./pkg/scopes/fetcher.go:27:	// APIHost is the GitHub API host (e.g., "https://api.github.com").
+./pkg/scopes/fetcher.go:28:	// Defaults to "https://api.github.com" if empty.
+./pkg/scopes/fetcher.go:125:	apiHost, err := utils.NewAPIHost("https://api.github.com/")
+=== 3. local filesystem writes ===
+./cmd/github-mcp-server/generate_docs.go:99:	err = os.WriteFile(readmePath, []byte(updatedContent), 0600)
+./cmd/github-mcp-server/generate_docs.go:128:	return os.WriteFile(docsPath, []byte(updatedContent), 0600) //#nosec G306
+./cmd/github-mcp-server/generate_docs.go:473:	err = os.WriteFile(docsPath, []byte(updatedContent), 0600)
+./cmd/github-mcp-server/feature_flag_docs.go:138:	return os.WriteFile(path, []byte(updated), 0600) //#nosec G306
+./internal/ghmcp/server.go:280:		file, err := os.OpenFile(cfg.LogFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
+./internal/toolsnaps/toolsnaps.go:84:	if err := os.WriteFile(snapPath, sortedJSON, 0600); err != nil {
+./internal/toolsnaps/toolsnaps_test.go:69:	require.NoError(t, os.WriteFile(filepath.Join("__toolsnaps__", "dummy.snap"), b, 0600))
+./internal/toolsnaps/toolsnaps_test.go:86:	require.NoError(t, os.WriteFile(filepath.Join("__toolsnaps__", "dummy.snap"), []byte(`{"name":"foo","value":1}`), 0600))
+./internal/toolsnaps/toolsnaps_test.go:103:	require.NoError(t, os.WriteFile(filepath.Join("__toolsnaps__", "dummy.snap"), []byte(`{"name":"foo","value":1}`), 0600))
+./internal/toolsnaps/toolsnaps_test.go:124:	require.NoError(t, os.WriteFile(filepath.Join("__toolsnaps__", "dummy.snap"), []byte(`not-json`), 0600))
+./pkg/http/server.go:115:		file, err := os.OpenFile(cfg.LogFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
+./pkg/toolvalidation/readonlyhint_test.go:19:	require.NoError(t, os.WriteFile(filepath.Join(dir, filename), []byte(source), 0o600))
+./pkg/translations/translations.go:61:	file, err := os.Create("github-mcp-server-config.json")
+=== 4. logging / telemetry ===
+./cmd/mcpcurl/main.go:174:		_, _ = fmt.Fprintf(os.Stderr, "Error getting pretty flag: %v\n", err)
+./cmd/mcpcurl/main.go:199:		_, _ = fmt.Fprintf(os.Stderr, "Error executing command: %v\n", err)
+./cmd/mcpcurl/main.go:214:				_, _ = fmt.Fprintf(os.Stderr, "failed to build arguments map: %v\n", err)
+./cmd/mcpcurl/main.go:220:				_, _ = fmt.Fprintf(os.Stderr, "failed to build JSONRPC request: %v\n", err)
+./cmd/mcpcurl/main.go:227:				_, _ = fmt.Fprintf(os.Stderr, "failed to get stdio-server-cmd: %v\n", err)
+./cmd/mcpcurl/main.go:232:				_, _ = fmt.Fprintf(os.Stderr, "error executing server command: %v\n", err)
+./cmd/mcpcurl/main.go:236:				_, _ = fmt.Fprintf(os.Stderr, "error printing response: %v\n", err)
+./cmd/mcpcurl/main.go:402:	// Stderr still uses a buffer
+./cmd/mcpcurl/main.go:404:	cmd.Stderr = &stderr
+./cmd/github-mcp-server/main.go:279:		fmt.Fprintf(os.Stderr, "%v\n", err)
+./internal/oauth/env.go:40:	cmd.Stderr = io.Discard
+./internal/oauth/testutil_test.go:7:	"log/slog"
+./internal/oauth/manager.go:7:	"log/slog"
+./internal/oauth/manager.go:92:		logger = slog.New(slog.NewTextHandler(os.Stderr, nil))
+./internal/ghmcp/server.go:7:	"log/slog"
+./internal/ghmcp/server.go:287:		logOutput = os.Stderr
+./internal/ghmcp/server.go:371:	_, _ = fmt.Fprintf(os.Stderr, "GitHub MCP Server running on stdio\n")
+./internal/ghmcp/oauth_test.go:7:	"log/slog"
+./internal/ghmcp/oauth.go:8:	"log/slog"
+./internal/profiler/profiler.go:11:	"log/slog"
+./script/print-mcp-diff-configs/main.go:102:		fmt.Fprintf(os.Stderr, "unknown transport %q (want stdio or http-headers)\n", *transport)
+./script/print-mcp-diff-configs/main.go:109:		fmt.Fprintln(os.Stderr, err)
+./pkg/observability/observability_test.go:5:	"log/slog"
+./pkg/observability/observability.go:6:	"log/slog"
+./pkg/github/fields_filtering_test.go:509:// tool and asserts the expected adoption and savings telemetry for each.
+./pkg/github/server.go:7:	"log/slog"
+./pkg/github/issues.go:1623:// requested subset, and emits fields telemetry. When false it is the original
+./pkg/github/issues.go:2680:// requested subset, and emits fields telemetry. When false it is the original
+./pkg/github/fields_telemetry.go:27:// recordFieldsUsage emits telemetry for a single call to a tool that supports
+./pkg/github/fields_telemetry.go:57:// recordFieldsUsageFor emits fields telemetry for a tool whose response is a
+./pkg/github/search.go:219:// requested subset, and emits fields telemetry. When false it is the original
+./pkg/github/search.go:379:// recordSearchCodeFieldsUsage emits fields telemetry for a search_code call.
+./pkg/github/pullrequests.go:1350:// request to the requested subset, and emits fields telemetry. When false it is
+./pkg/github/pullrequests.go:1668:// filters each result to the requested subset, and emits fields telemetry. When
+./pkg/github/repositories.go:160:// requested subset, and emits fields telemetry. When false it is the original
+./pkg/github/repositories.go:443:If updating, you should provide the SHA of the file you want to update. Use this tool to create or update a file in a GitHub repository remotely; do not use it for local file operations.
+./pkg/github/repositories.go:779:// listings to the requested subset, and emits fields telemetry. When false it is
+./pkg/github/repositories.go:1011:// recordDirContentsFieldsUsage emits fields telemetry for a get_file_contents
+./pkg/github/repositories.go:1878:// requested subset, and emits fields telemetry. When false it is the original
+./pkg/github/fields_telemetry_test.go:5:	"log/slog"
+./pkg/github/fields_telemetry_test.go:17:// metrics so tests can assert on telemetry. It is safe for concurrent use.
+./pkg/github/dependencies.go:7:	"log/slog"
+./pkg/github/dependencies.go:213:		fmt.Fprintf(os.Stderr, "Feature flag check error for %q: %v\n", flagName, err)
+./pkg/github/dependencies.go:444:		fmt.Fprintf(os.Stderr, "Feature flag check error for %q: %v\n", flagName, err)
+./pkg/github/dependencies_test.go:6:	"log/slog"
+./pkg/github/search_utils.go:50:	// its dependencies so fields telemetry can be recorded.
+./pkg/github/search_utils.go:67:// preserved. tool and deps identify the caller so fields telemetry (adoption and
+./pkg/github/server_test.go:8:	"log/slog"
+./pkg/http/middleware/pat_scope_test.go:6:	"log/slog"
+./pkg/http/middleware/pat_scope.go:4:	"log/slog"
+./pkg/http/handler.go:6:	"log/slog"
+./pkg/http/server.go:7:	"log/slog"
+./pkg/http/server.go:122:		logOutput = os.Stderr
+./pkg/http/handler_test.go:5:	"log/slog"
+./pkg/lockdown/lockdown.go:6:	"log/slog"
+./pkg/inventory/registry.go:276:			fmt.Fprintf(os.Stderr, "Warning: tool %q is deprecated, use %q instead\n", toolName, canonicalName)
+./pkg/inventory/filters.go:33:		fmt.Fprintf(os.Stderr, "Feature flag check error for %q: %v\n", flagName, err)
+./pkg/inventory/filters.go:55:			fmt.Fprintf(os.Stderr, "Feature flag check error for %q: %v\n", flag, err)
+./pkg/inventory/filters.go:90:			fmt.Fprintf(os.Stderr, "Tool.Enabled check error for %q: %v\n", tool.Tool.Name, err)
+./pkg/inventory/filters.go:105:			fmt.Fprintf(os.Stderr, "Builder filter error for tool %q: %v\n", tool.Tool.Name, err)
+./pkg/log/io.go:6:	"log/slog"
+./pkg/log/io_test.go:8:	"log/slog"
+=== 5. telemetry deps in go.mod ===
+=== 6. background activity (effects with no inducing request) ===
+./cmd/github-mcp-server/generate_docs.go:28:func init() {
+./cmd/github-mcp-server/list_scopes.go:71:func init() {
+./cmd/github-mcp-server/main.go:204:func init() {
+./internal/oauth/env.go:47:	go func() { _ = cmd.Wait() }()
+./internal/oauth/manager_test.go:205:	go func() {
+./internal/oauth/manager_test.go:242:	go func() {
+./internal/oauth/manager_test.go:284:	go func() {
+./internal/oauth/manager_test.go:420:	go func() {
+./internal/oauth/callback.go:70:	go func() {
+./internal/oauth/manager.go:302:		go func() {
+./internal/ghmcp/server.go:353:	go func() {
+./e2e/e2e_test.go:234:		go func() {
+./pkg/github/ui_resources_test.go:40:	go func() {
+./pkg/github/ui_resources_test.go:97:	go func() {
+./pkg/github/ui_resources_test.go:131:	go func() {
+./pkg/github/server_test.go:257:			go func() {
+./pkg/http/server.go:208:	go func() {
+=== 7. auth plumbing ===
+./internal/oauth/manager_test.go:14:	"golang.org/x/oauth2"
+./internal/oauth/manager_test.go:252:type blockingTokenSource struct {
+./internal/oauth/manager_test.go:258:func (s *blockingTokenSource) Token() (*oauth2.Token, error) {
+./internal/oauth/manager_test.go:267:	staleSource := &blockingTokenSource{
+./internal/oauth/manager_test.go:290:	m.complete("existing-flow", &oauth2.Token{
+./internal/oauth/testutil_test.go:15:	"golang.org/x/oauth2"
+./internal/oauth/testutil_test.go:60:func (f *fakeGitHub) endpoint() oauth2.Endpoint {
+./internal/oauth/testutil_test.go:61:	return oauth2.Endpoint{
+./internal/oauth/flow.go:9:	"golang.org/x/oauth2"
+./internal/oauth/flow.go:25:	run func(context.Context) (*oauth2.Token, error)
+./internal/oauth/flow.go:78:	verifier := oauth2.GenerateVerifier()
+./internal/oauth/flow.go:95:	oc := m.oauth2Config(cs.redirect)
+./internal/oauth/flow.go:96:	authURL := oc.AuthCodeURL(state, oauth2.S256ChallengeOption(verifier))
+./internal/oauth/flow.go:98:	run := func(ctx context.Context) (*oauth2.Token, error) {
+./internal/oauth/flow.go:103:		tok, err := oc.Exchange(ctx, code, oauth2.VerifierOption(verifier))
+./internal/oauth/flow.go:160:	oc := m.oauth2Config("")
+./internal/oauth/flow.go:169:	run := func(ctx context.Context) (*oauth2.Token, error) {
+./internal/oauth/flow.go:218:func deviceInstruction(da *oauth2.DeviceAuthResponse) string {
+./internal/oauth/oauth.go:7:// refresh token; this package always returns a refreshing [golang.org/x/oauth2.TokenSource]
+./internal/oauth/oauth.go:10:// The package depends only on golang.org/x/oauth2 and the standard library. MCP
+./internal/oauth/oauth.go:21:	"golang.org/x/oauth2"
+./internal/oauth/oauth.go:33:	Endpoint oauth2.Endpoint
+./internal/oauth/oauth.go:55:func GitHubEndpoint(host string) oauth2.Endpoint {
+./internal/oauth/oauth.go:57:	return oauth2.Endpoint{
+./internal/oauth/manager.go:13:	"golang.org/x/oauth2"
+./internal/oauth/manager.go:69:	refreshConfig *oauth2.Config
+./internal/oauth/manager.go:77:	source           oauth2.TokenSource // refreshing source, set once authorized
+./internal/oauth/manager.go:100:	m.refreshConfig = m.oauth2Config("")
+./internal/oauth/manager.go:125:	// Refresh (if needed) happens here, off the lock, because ReuseTokenSource may
+./internal/oauth/manager.go:132:		// prompt. The oauth2 error carries the token endpoint's response, not the
+./internal/oauth/manager.go:353:func (m *Manager) complete(flowID string, tok *oauth2.Token, err error) {
+./internal/oauth/manager.go:368:		// Config.TokenSource returns a ReuseTokenSource that refreshes expired
+./internal/oauth/manager.go:372:		refreshCtx := context.WithValue(context.Background(), oauth2.HTTPClient, &http.Client{Timeout: tokenRefreshTimeout})
+./internal/oauth/manager.go:373:		m.source = m.refreshConfig.TokenSource(refreshCtx, tok)
+./internal/oauth/manager.go:420:func (m *Manager) oauth2Config(redirectURL string) *oauth2.Config {
+./internal/oauth/manager.go:421:	return &oauth2.Config{
+./internal/githubv4mock/local_round_tripper.go:34:// localRoundTripper is an http.RoundTripper that executes HTTP transactions
+./internal/githubv4mock/local_round_tripper.go:36:type localRoundTripper struct {
+./internal/githubv4mock/local_round_tripper.go:40:func (l localRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+./internal/githubv4mock/githubv4mock.go:202:	return &http.Client{Transport: &localRoundTripper{
+./internal/ghmcp/server.go:36:	restUATransp *transport.UserAgentTransport
+./internal/ghmcp/server.go:66:	// authenticate via BearerAuthTransport and skip go-github's WithAuthToken:
+./internal/ghmcp/server.go:69:	restUATransport := &transport.UserAgentTransport{
+./internal/ghmcp/server.go:70:		Transport: http.DefaultTransport,
+./internal/ghmcp/server.go:76:			gogithub.WithHTTPClient(&http.Client{Transport: &transport.BearerAuthTransport{
+./internal/ghmcp/server.go:77:				Transport:     restUATransport,
+./internal/ghmcp/server.go:84:			gogithub.WithHTTPClient(&http.Client{Transport: restUATransport}),
+./internal/ghmcp/server.go:96:		Transport: &transport.BearerAuthTransport{
+./internal/ghmcp/server.go:97:			Transport: &transport.GraphQLFeaturesTransport{
+./internal/ghmcp/server.go:98:				Transport: http.DefaultTransport,
+./internal/ghmcp/server.go:127:		restUATransp: restUATransport,
+./internal/ghmcp/server.go:367:		errC <- ghServer.Run(ctx, &mcp.IOTransport{Reader: in, Writer: out})
+./internal/ghmcp/server.go:397:func addUserAgentsMiddleware(cfg github.MCPServerConfig, restUATransp *transport.UserAgentTransport, gqlHTTPClient *http.Client) func(next mcp.MethodHandler) mcp.MethodHandler {
+./internal/ghmcp/server.go:422:			gqlHTTPClient.Transport = &transport.UserAgentTransport{
+./internal/ghmcp/server.go:423:				Transport: gqlHTTPClient.Transport,
+./internal/ghmcp/oauth_test.go:50:	st, ct := mcp.NewInMemoryTransports()
+./internal/ghmcp/oauth_test.go:190:// TestSessionPrompterTransportError verifies that a prompt which fails to be
+./internal/ghmcp/oauth_test.go:194:func TestSessionPrompterTransportError(t *testing.T) {
+./internal/ghmcp/oauth_test.go:364:	st, ct := mcp.NewInMemoryTransports()
+./internal/ghmcp/oauth_test.go:521:	st, ct := mcp.NewInMemoryTransports()
+./script/print-mcp-diff-configs/main.go:46:	Transport string            `json:"transport,omitempty"`
+./script/print-mcp-diff-configs/main.go:72:	transport := flag.String("transport", "stdio", "Transport to target: stdio or http-headers")
+./script/print-mcp-diff-configs/main.go:96:				Transport: "streamable-http",
+./e2e/e2e_test.go:204:		// Create the client using CommandTransport
+./e2e/e2e_test.go:206:		transport := &mcp.CommandTransport{Command: exec.Command("docker", args...)}
+./e2e/e2e_test.go:233:		serverTransport, clientTransport := mcp.NewInMemoryTransports()
+./e2e/e2e_test.go:235:			_ = ghServer.Run(ctx, serverTransport)
+./e2e/e2e_test.go:241:		session, err = client.Connect(ctx, clientTransport, nil)
+./pkg/github/helper_test.go:364:	st, _ := mcp.NewInMemoryTransports()
+./pkg/github/helper_test.go:531:// MockRoundTripper is a mock HTTP transport using testify/mock
+./pkg/github/helper_test.go:532:type MockRoundTripper struct {
+./pkg/github/helper_test.go:537:// NewMockRoundTripper creates a new mock round tripper
+./pkg/github/helper_test.go:538:func NewMockRoundTripper() *MockRoundTripper {
+./pkg/github/helper_test.go:539:	return &MockRoundTripper{
+./pkg/github/helper_test.go:544:// RoundTrip implements the http.RoundTripper interface
+./pkg/github/helper_test.go:545:func (m *MockRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/github/helper_test.go:575:func (m *MockRoundTripper) OnRequest(method, path string, handler http.HandlerFunc) *MockRoundTripper {
+./pkg/github/helper_test.go:582:func NewMockHTTPClient() (*http.Client, *MockRoundTripper) {
+./pkg/github/helper_test.go:583:	transport := NewMockRoundTripper()
+./pkg/github/helper_test.go:584:	client := &http.Client{Transport: transport}
+./pkg/github/helper_test.go:685:	transport := &multiHandlerTransport{handlers: handlers}
+./pkg/github/helper_test.go:686:	return &http.Client{Transport: transport}
+./pkg/github/helper_test.go:747:type multiHandlerTransport struct {
+./pkg/github/helper_test.go:751:func (m *multiHandlerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/github/ui_resources_test.go:33:	st, ct := mcp.NewInMemoryTransports()
+./pkg/github/ui_resources_test.go:90:	st, ct := mcp.NewInMemoryTransports()
+./pkg/github/ui_resources_test.go:124:	st, ct := mcp.NewInMemoryTransports()
+./pkg/github/granular_tools_test.go:2404:		// Build a transport chain matching production: GraphQLFeaturesTransport
+./pkg/github/granular_tools_test.go:2405:		// wraps a header-capturing spy, which forwards to the mock's RoundTripper.
+./pkg/github/granular_tools_test.go:2409:		spy := &headerCaptureTransport{inner: mockClient.Transport}
+./pkg/github/granular_tools_test.go:2411:			Transport: &transportpkg.GraphQLFeaturesTransport{Transport: spy},
+./pkg/github/issues_test.go:39:type repoAccessMockTransport struct {
+./pkg/github/issues_test.go:49:	return &http.Client{Transport: &repoAccessMockTransport{responses: responses}}
+./pkg/github/issues_test.go:64:func (rt *repoAccessMockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/github/issues_test.go:2663:		// Build a transport chain matching production: GraphQLFeaturesTransport
+./pkg/github/issues_test.go:2664:		// wraps a header-capturing spy, which forwards to the mock's RoundTripper.
+./pkg/github/issues_test.go:2668:		spy := &headerCaptureTransport{inner: mockClient.Transport}
+./pkg/github/issues_test.go:2670:			Transport: &transportpkg.GraphQLFeaturesTransport{Transport: spy},
+./pkg/github/issues_test.go:2684:// headerCaptureTransport records the headers of the most recent request that passed
+./pkg/github/issues_test.go:2685:// through it before forwarding to the inner RoundTripper.
+./pkg/github/issues_test.go:2686:type headerCaptureTransport struct {
+./pkg/github/issues_test.go:2687:	inner    http.RoundTripper
+./pkg/github/issues_test.go:2691:func (t *headerCaptureTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/github/repository_resource_test.go:15:// errorTransport is a http.RoundTripper that always returns an error.
+./pkg/github/repository_resource_test.go:16:type errorTransport struct {
+./pkg/github/repository_resource_test.go:20:func (t *errorTransport) RoundTrip(*http.Request) (*http.Response, error) {
+./pkg/github/repository_resource_test.go:292:	httpClient := &http.Client{Transport: &errorTransport{err: networkErr}}
+./pkg/github/ui_tools_test.go:23:// recorderTransport routes HTTP requests through an in-process handler, mirroring
+./pkg/github/ui_tools_test.go:28:type recorderTransport struct{ handler http.Handler }
+./pkg/github/ui_tools_test.go:30:func (rt recorderTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/github/ui_tools_test.go:71:	return &http.Client{Transport: recorderTransport{handler: mux}}
+./pkg/github/dependencies.go:348:	// Wrap transport with GraphQLFeaturesTransport to inject feature flags from context,
+./pkg/github/dependencies.go:351:		Transport: &transport.BearerAuthTransport{
+./pkg/github/dependencies.go:352:			Transport: &transport.GraphQLFeaturesTransport{
+./pkg/github/dependencies.go:353:				Transport: http.DefaultTransport,
+./pkg/github/ui_capability_test.go:16:	st, _ := mcp.NewInMemoryTransports()
+./pkg/github/server_test.go:249:			st, ct := mcp.NewInMemoryTransports()
+./pkg/http/transport/user_agent.go:9:type UserAgentTransport struct {
+./pkg/http/transport/user_agent.go:10:	Transport http.RoundTripper
+./pkg/http/transport/user_agent.go:14:func (t *UserAgentTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/http/transport/user_agent.go:17:	return t.Transport.RoundTrip(req)
+./pkg/http/transport/graphql_features_test.go:16:func TestGraphQLFeaturesTransport(t *testing.T) {
+./pkg/http/transport/graphql_features_test.go:67:			transport := &GraphQLFeaturesTransport{
+./pkg/http/transport/graphql_features_test.go:68:				Transport: http.DefaultTransport,
+./pkg/http/transport/graphql_features_test.go:94:func TestGraphQLFeaturesTransport_NilTransport(t *testing.T) {
+./pkg/http/transport/graphql_features_test.go:106:	// Create the transport with nil Transport (should use DefaultTransport)
+./pkg/http/transport/graphql_features_test.go:107:	transport := &GraphQLFeaturesTransport{
+./pkg/http/transport/graphql_features_test.go:108:		Transport: nil,
+./pkg/http/transport/graphql_features_test.go:125:func TestGraphQLFeaturesTransport_DoesNotMutateOriginalRequest(t *testing.T) {
+./pkg/http/transport/graphql_features_test.go:135:	transport := &GraphQLFeaturesTransport{
+./pkg/http/transport/graphql_features_test.go:136:		Transport: http.DefaultTransport,
+./pkg/http/transport/bearer.go:11:type BearerAuthTransport struct {
+./pkg/http/transport/bearer.go:12:	Transport http.RoundTripper
+./pkg/http/transport/bearer.go:22:func (t *BearerAuthTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/http/transport/bearer.go:39:	return t.Transport.RoundTrip(req)
+./pkg/http/transport/graphql_features.go:11:// GraphQLFeaturesTransport is an http.RoundTripper that adds GraphQL-Features
+./pkg/http/transport/graphql_features.go:24://	    Transport: &transport.GraphQLFeaturesTransport{
+./pkg/http/transport/graphql_features.go:25://	        Transport: http.DefaultTransport,
+./pkg/http/transport/graphql_features.go:31:type GraphQLFeaturesTransport struct {
+./pkg/http/transport/graphql_features.go:32:	// Transport is the underlying HTTP transport. If nil, http.DefaultTransport is used.
+./pkg/http/transport/graphql_features.go:33:	Transport http.RoundTripper
+./pkg/http/transport/graphql_features.go:36:// RoundTrip implements http.RoundTripper.
+./pkg/http/transport/graphql_features.go:37:func (t *GraphQLFeaturesTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/http/transport/graphql_features.go:38:	transport := t.Transport
+./pkg/http/transport/graphql_features.go:40:		transport = http.DefaultTransport
+./pkg/http/transport/bearer_test.go:16:func TestBearerAuthTransport(t *testing.T) {
+./pkg/http/transport/bearer_test.go:59:			rt := &BearerAuthTransport{
+./pkg/http/transport/bearer_test.go:60:				Transport:     http.DefaultTransport,
+./pkg/http/transport/bearer_test.go:77:// TestBearerAuthTransport_TokenProviderResolvedPerRequest verifies that the
+./pkg/http/transport/bearer_test.go:81:func TestBearerAuthTransport_TokenProviderResolvedPerRequest(t *testing.T) {
+./pkg/http/transport/bearer_test.go:92:	rt := &BearerAuthTransport{
+./pkg/http/transport/bearer_test.go:93:		Transport:     http.DefaultTransport,
+./pkg/http/transport/bearer_test.go:117:func TestBearerAuthTransport_PassesGraphQLFeaturesHeader(t *testing.T) {
+./pkg/http/transport/bearer_test.go:127:	rt := &BearerAuthTransport{
+./pkg/http/transport/bearer_test.go:128:		Transport: http.DefaultTransport,
+./pkg/http/transport/bearer_test.go:143:func TestBearerAuthTransport_DoesNotMutateOriginalRequest(t *testing.T) {
+./pkg/http/transport/bearer_test.go:151:	rt := &BearerAuthTransport{
+./pkg/http/transport/bearer_test.go:152:		Transport: http.DefaultTransport,
+./pkg/lockdown/lockdown_test.go:39:type countingTransport struct {
+./pkg/lockdown/lockdown_test.go:41:	next  http.RoundTripper
+./pkg/lockdown/lockdown_test.go:45:func (c *countingTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/lockdown/lockdown_test.go:52:func (c *countingTransport) CallCount() int {
+./pkg/lockdown/lockdown_test.go:58:func newMockGQLClient(viewerLogin string, isPrivate bool) (*githubv4.Client, *countingTransport) {
+./pkg/lockdown/lockdown_test.go:81:	counting := &countingTransport{next: httpClient.Transport}
+./pkg/lockdown/lockdown_test.go:82:	httpClient.Transport = counting
+./pkg/lockdown/lockdown_test.go:100:func newMockRepoAccessCache(t *testing.T, ttl time.Duration) (*RepoAccessCache, *countingTransport) {
+./pkg/lockdown/lockdown_test.go:155:type flakyTransport struct {
+./pkg/lockdown/lockdown_test.go:159:	next  http.RoundTripper
+./pkg/lockdown/lockdown_test.go:162:func (f *flakyTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/lockdown/lockdown_test.go:185:	flaky := &flakyTransport{next: httpClient.Transport, failN: 1}
+./pkg/lockdown/lockdown_test.go:186:	httpClient.Transport = flaky
+./pkg/inventory/server_tool_test.go:108:	st, ct := mcp.NewInMemoryTransports()
+./pkg/raw/raw_test.go:16:// mockRawTransport is a custom HTTP transport for testing raw content API
+./pkg/raw/raw_test.go:17:type mockRawTransport struct {
+./pkg/raw/raw_test.go:23:func (m *mockRawTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+./pkg/raw/raw_test.go:105:				Transport: &mockRawTransport{
+=== 8. caching / conditional requests ===
+./cmd/github-mcp-server/main.go:96:			ttl := viper.GetDuration("repo-access-cache-ttl")
+./cmd/github-mcp-server/main.go:112:				RepoAccessCacheTTL:   &ttl,
+./cmd/github-mcp-server/main.go:175:			ttl := viper.GetDuration("repo-access-cache-ttl")
+./cmd/github-mcp-server/main.go:188:				RepoAccessCacheTTL:   &ttl,
+./cmd/github-mcp-server/main.go:223:	rootCmd.PersistentFlags().Duration("repo-access-cache-ttl", 5*time.Minute, "Override the repo access cache TTL (e.g. 1m, 0s to disable)")
+./cmd/github-mcp-server/main.go:254:	_ = viper.BindPFlag("repo-access-cache-ttl", rootCmd.PersistentFlags().Lookup("repo-access-cache-ttl"))
+./internal/oauth/manager.go:107:// token source caches and only refreshes when the token has expired.
+./internal/ghmcp/server.go:40:	repoAccess   *lockdown.RepoAccessCache
+./internal/ghmcp/server.go:113:	// Set up repo access cache for lockdown mode
+./internal/ghmcp/server.go:114:	var repoAccessCache *lockdown.RepoAccessCache
+./internal/ghmcp/server.go:122:		repoAccessCache = lockdown.NewRepoAccessCache(gqlClient, restClient, opts...)
+./internal/ghmcp/server.go:131:		repoAccess:   repoAccessCache,
+./internal/ghmcp/server.go:246:	// RepoAccessCacheTTL overrides the default TTL for repository access cache entries.
+./internal/ghmcp/server.go:247:	RepoAccessCacheTTL *time.Duration
+./internal/ghmcp/server.go:337:		RepoAccessTTL:         cfg.RepoAccessCacheTTL,
+./e2e/e2e_test.go:369:	tagObj, _, err := ghClient.Git.CreateTag(context.Background(), currentOwner, repoName, gogithub.CreateTag{
+./pkg/github/server.go:58:	// RepoAccessTTL overrides the default TTL for repository access cache entries.
+./pkg/github/repository_resource_completions_test.go:156:func TestCompleteTag_MissingDependencies(t *testing.T) {
+./pkg/github/repository_resource_completions_test.go:161:	result, err := completeTag(ctx, nil, resolved, "v1.0")
+./pkg/github/repository_resource_completions_test.go:163:	assert.Nil(t, result) // completeTag returns nil for missing dependencies
+./pkg/github/repository_resource_completions_test.go:167:	result, err = completeTag(ctx, nil, resolved, "v1.0")
+./pkg/github/issues.go:716:	cache, err := deps.GetRepoAccessCache(ctx)
+./pkg/github/issues.go:718:		return nil, fmt.Errorf("failed to get repo access cache: %w", err)
+./pkg/github/issues.go:737:		if restricted, err := authorLockdownResult(ctx, cache, owner, repo, issue.GetUser().GetLogin(), lockdownIssueRestrictedMessage); restricted != nil || err != nil {
+./pkg/github/issues.go:762:				applyIssueReadEnrichment(ctx, &minimalIssue, enrichment, cache, flags.LockdownMode)
+./pkg/github/issues.go:774:func applyIssueReadEnrichment(ctx context.Context, minimalIssue *MinimalIssue, enrichment *issueReadEnrichment, cache *lockdown.RepoAccessCache, lockdownMode bool) {
+./pkg/github/issues.go:788:		if !lockdownMode || isSafeParentContent(ctx, cache, parent) {
+./pkg/github/issues.go:801:// It fails closed: any inability to positively verify safe content (missing cache, missing author,
+./pkg/github/issues.go:803:func isSafeParentContent(ctx context.Context, cache *lockdown.RepoAccessCache, parent *issueReadParent) bool {
+./pkg/github/issues.go:804:	if cache == nil || parent.AuthorLogin == "" {
+./pkg/github/issues.go:811:	safe, err := cache.IsSafeContent(ctx, parent.AuthorLogin, owner, repo)
+./pkg/github/issues.go:819:	cache, err := deps.GetRepoAccessCache(ctx)
+./pkg/github/issues.go:821:		return nil, fmt.Errorf("failed to get repo access cache: %w", err)
+./pkg/github/issues.go:846:		if cache == nil {
+./pkg/github/issues.go:847:			return nil, fmt.Errorf("lockdown cache is not configured")
+./pkg/github/issues.go:859:			isSafeContent, err := cache.IsSafeContent(ctx, login, owner, repo)
+./pkg/github/issues.go:879:	cache, err := deps.GetRepoAccessCache(ctx)
+./pkg/github/issues.go:881:		return nil, fmt.Errorf("failed to get repo access cache: %w", err)
+./pkg/github/issues.go:910:		if cache == nil {
+./pkg/github/issues.go:911:			return nil, fmt.Errorf("lockdown cache is not configured")
+./pkg/github/issues.go:923:			isSafeContent, err := cache.IsSafeContent(ctx, login, owner, repo)
+./pkg/github/issues.go:950:	cache, err := deps.GetRepoAccessCache(ctx)
+./pkg/github/issues.go:952:		return nil, fmt.Errorf("failed to get repo access cache: %w", err)
+./pkg/github/issues.go:991:		if cache == nil {
+./pkg/github/issues.go:992:			return nil, fmt.Errorf("lockdown cache is not configured")
+./pkg/github/issues.go:1001:		isSafeContent, err := cache.IsSafeContent(ctx, parentAuthorLogin, parentOwner, parentRepo)
+./pkg/github/ifc_labels.go:140:// callers invoke it unconditionally) and caches the repository visibility
+./pkg/github/ifc_labels.go:142:// for one FetchRepoIsPrivate call. A failed visibility lookup is not cached, so
+./pkg/github/repository_resource_completions.go:22:	"tag":      completeTag,
+./pkg/github/repository_resource_completions.go:191:func completeTag(ctx context.Context, client *github.Client, resolved map[string]string, argValue string) ([]string, error) {
+./pkg/github/issues_test.go:249:			cache := stubRepoAccessCache(restClient, 15*time.Minute)
+./pkg/github/issues_test.go:255:				RepoAccessCache: cache,
+./pkg/github/issues_test.go:449:	cache := stubRepoAccessCache(nil, 15*time.Minute)
+./pkg/github/issues_test.go:454:		RepoAccessCache: cache,
+./pkg/github/issues_test.go:537:	cache := stubRepoAccessCache(nil, 15*time.Minute)
+./pkg/github/issues_test.go:541:		RepoAccessCache: cache,
+./pkg/github/issues_test.go:668:				RepoAccessCache: stubRepoAccessCache(nil, 15*time.Minute),
+./pkg/github/issues_test.go:714:	// REST lockdown gate). The repo-access cache performs push-access checks against its own
+./pkg/github/issues_test.go:740:		RepoAccessCache: stubRepoAccessCache(permClient, 15*time.Minute),
+./pkg/github/issues_test.go:784:		RepoAccessCache: stubRepoAccessCache(nil, 15*time.Minute),
+./pkg/github/issues_test.go:3631:			cache := stubRepoAccessCache(restClient, 15*time.Minute)
+./pkg/github/issues_test.go:3636:				RepoAccessCache: cache,
+./pkg/github/issues_test.go:3756:				RepoAccessCache: stubRepoAccessCache(nil, 15*time.Minute),
+./pkg/github/issues_test.go:3918:				RepoAccessCache: stubRepoAccessCache(restClient, 15*time.Minute),
+./pkg/github/issues_test.go:4350:				RepoAccessCache: stubRepoAccessCache(nil, 15*time.Minute),
+./pkg/github/repository_resource_test.go:172:				return RepositoryResourceContentsHandler(repositoryResourceTagContentURITemplate)
+./pkg/github/search.go:566:				Description: "Commit search query (GitHub commit search REST). Searches commit messages on the default branch only. Scope the search with `repo:owner/repo`, `org:`, or `user:` (queries without a scope qualifier match across all of GitHub and are usually not what you want). Other qualifiers: `author:`, `committer:`, `author-name:`, `committer-name:`, `author-email:`, `committer-email:`, `author-date:`, `committer-date:` (supports `>`, `<`, `>=`, `<=`, and `YYYY-MM-DD..YYYY-MM-DD` ranges), `merge:true|false`, `hash:`, `tree:`, `parent:`, `is:public`. Examples: `repo:owner/repo fix panic`; `org:github author:defunkt committer-date:>=2024-01-01`; `\"refactor cache\" repo:o/r`; `hash:abc1234 repo:o/r`.",
+./pkg/github/pullrequests.go:164:	cache, err := deps.GetRepoAccessCache(ctx)
+./pkg/github/pullrequests.go:166:		return nil, fmt.Errorf("failed to get repo access cache: %w", err)
+./pkg/github/pullrequests.go:199:		if restricted, err := authorLockdownResult(ctx, cache, owner, repo, pr.GetUser().GetLogin(), lockdownPullRequestRestrictedMessage); restricted != nil || err != nil {
+./pkg/github/pullrequests.go:217:	cache, err := deps.GetRepoAccessCache(ctx)
+./pkg/github/pullrequests.go:219:		return nil, fmt.Errorf("failed to get repo access cache: %w", err)
+./pkg/github/pullrequests.go:235:	return authorLockdownResult(ctx, cache, owner, repo, pr.GetUser().GetLogin(), lockdownPullRequestRestrictedMessage)
+./pkg/github/pullrequests.go:488:	cache, err := deps.GetRepoAccessCache(ctx)
+./pkg/github/pullrequests.go:490:		return nil, fmt.Errorf("failed to get repo access cache: %w", err)
+./pkg/github/pullrequests.go:527:		if cache == nil {
+./pkg/github/pullrequests.go:528:			return nil, fmt.Errorf("lockdown cache is not configured")
+./pkg/github/pullrequests.go:539:					isSafeContent, err := cache.IsSafeContent(ctx, login, owner, repo)
+./pkg/github/pullrequests.go:558:	cache, err := deps.GetRepoAccessCache(ctx)
+./pkg/github/pullrequests.go:560:		return nil, fmt.Errorf("failed to get repo access cache: %w", err)
+./pkg/github/pullrequests.go:586:		if cache == nil {
+./pkg/github/pullrequests.go:587:			return nil, fmt.Errorf("lockdown cache is not configured")
+./pkg/github/pullrequests.go:595:			isSafeContent, err := cache.IsSafeContent(ctx, login, owner, repo)
+./pkg/github/resources.go:16:		GetRepositoryResourceTagContent(t),
+./pkg/github/repositories.go:870:			// lazily on first use and cached because GetFileContents has
+./pkg/github/repositories.go:873:			// than misclassify the result; the failure is not cached so a
+./pkg/github/lockdown_test.go:15:	t.Run("missing cache returns error", func(t *testing.T) {
+./pkg/github/lockdown_test.go:22:		cache := stubRepoAccessCache(nil, time.Minute)
+./pkg/github/lockdown_test.go:23:		result, err := authorLockdownResult(context.Background(), cache, "owner", "repo", "", lockdownIssueRestrictedMessage)
+./pkg/github/lockdown_test.go:31:		cache := stubRepoAccessCache(nil, time.Minute)
+./pkg/github/lockdown_test.go:32:		result, err := authorLockdownResult(context.Background(), cache, "owner", "repo", "author", lockdownIssueRestrictedMessage)
+./pkg/github/pullrequests_test.go:145:				RepoAccessCache: stubRepoAccessCache(restClient, 5*time.Minute),
+./pkg/github/pullrequests_test.go:1340:				RepoAccessCache: stubRepoAccessCache(restClient, 5*time.Minute),
+./pkg/github/pullrequests_test.go:1516:				RepoAccessCache: stubRepoAccessCache(nil, 5*time.Minute),
+./pkg/github/pullrequests_test.go:1679:				RepoAccessCache: stubRepoAccessCache(nil, 5*time.Minute),
+./pkg/github/pullrequests_test.go:1835:				RepoAccessCache: stubRepoAccessCache(nil, 5*time.Minute),
+./pkg/github/pullrequests_test.go:2306:			// Setup cache for lockdown mode
+./pkg/github/pullrequests_test.go:2315:			cache := stubRepoAccessCache(restClient, 5*time.Minute)
+./pkg/github/pullrequests_test.go:2322:				RepoAccessCache: cache,
+./pkg/github/pullrequests_test.go:2539:			cache := stubRepoAccessCache(restClient, 5*time.Minute)
+./pkg/github/pullrequests_test.go:2544:				RepoAccessCache: cache,
+./pkg/github/pullrequests_test.go:4021:				RepoAccessCache: stubRepoAccessCache(restClient, 5*time.Minute),
+./pkg/github/dependencies.go:86:	// GetRepoAccessCache returns the lockdown mode repo access cache
+./pkg/github/dependencies.go:87:	GetRepoAccessCache(ctx context.Context) (*lockdown.RepoAccessCache, error)
+./pkg/github/dependencies.go:120:	RepoAccessCache   *lockdown.RepoAccessCache
+./pkg/github/dependencies.go:140:	repoAccessCache *lockdown.RepoAccessCache,
+./pkg/github/dependencies.go:151:		RepoAccessCache:   repoAccessCache,
+./pkg/github/dependencies.go:175:// GetRepoAccessCache implements ToolDependencies.
+./pkg/github/dependencies.go:176:func (d BaseDeps) GetRepoAccessCache(_ context.Context) (*lockdown.RepoAccessCache, error) {
+./pkg/github/dependencies.go:177:	return d.RepoAccessCache, nil
+./pkg/github/dependencies.go:388:// GetRepoAccessCache implements ToolDependencies.
+./pkg/github/dependencies.go:389:func (d *RequestDeps) GetRepoAccessCache(ctx context.Context) (*lockdown.RepoAccessCache, error) {
+./pkg/github/dependencies.go:404:	// Create repo access cache
+./pkg/github/dependencies.go:405:	instance := lockdown.NewRepoAccessCache(gqlClient, restClient, d.RepoAccessOpts...)
+./pkg/github/dependencies_test.go:34:		nil, // repoAccessCache
+./pkg/github/dependencies_test.go:59:		nil, // repoAccessCache
+./pkg/github/dependencies_test.go:84:		nil, // repoAccessCache
+./pkg/github/dependencies_test.go:109:		nil, // repoAccessCache
+./pkg/github/repository_resource.go:29:	repositoryResourceTagContentURITemplate    = uritemplate.MustNew("repo://{owner}/{repo}/refs/tags/{tag}/contents{/path*}")
+./pkg/github/repository_resource.go:75:// GetRepositoryResourceTagContent defines the resource template for getting repository content for a tag.
+./pkg/github/repository_resource.go:76:func GetRepositoryResourceTagContent(t translations.TranslationHelperFunc) inventory.ServerResourceTemplate {
+./pkg/github/repository_resource.go:81:			URITemplate: repositoryResourceTagContentURITemplate.Raw(),
+./pkg/github/repository_resource.go:85:		repositoryResourceContentsHandlerFunc(repositoryResourceTagContentURITemplate),
+./pkg/github/repository_resource.go:287:			return repositoryResourceTagContentURITemplate.Expand(baseValues)
+./pkg/github/lockdown.go:22:// It fails closed: a missing cache, an empty author, or a lookup error denies access.
+./pkg/github/lockdown.go:23:func authorLockdownResult(ctx context.Context, cache *lockdown.RepoAccessCache, owner, repo, authorLogin, restrictedMessage string) (*mcp.CallToolResult, error) {
+./pkg/github/lockdown.go:24:	if cache == nil {
+./pkg/github/lockdown.go:25:		return nil, fmt.Errorf("lockdown cache is not configured")
+./pkg/github/lockdown.go:30:	isSafeContent, err := cache.IsSafeContent(ctx, authorLogin, owner, repo)
+./pkg/github/server_test.go:33:	repoAccessCache   *lockdown.RepoAccessCache
+./pkg/github/server_test.go:61:func (s stubDeps) GetRepoAccessCache(_ context.Context) (*lockdown.RepoAccessCache, error) {
+./pkg/github/server_test.go:62:	return s.repoAccessCache, nil
+./pkg/github/server_test.go:102:func stubRepoAccessCache(restClient *gogithub.Client, ttl time.Duration) *lockdown.RepoAccessCache {
+./pkg/github/server_test.go:103:	cacheName := fmt.Sprintf("repo-access-cache-test-%d", time.Now().UnixNano())
+./pkg/github/server_test.go:104:	return lockdown.NewRepoAccessCache(
+./pkg/github/server_test.go:108:		lockdown.WithCacheName(cacheName),
+./pkg/http/handler.go:38:	schemaCache            *mcp.SchemaCache
+./pkg/http/handler.go:109:	// Create a shared schema cache to avoid repeated JSON schema reflection
+./pkg/http/handler.go:111:	schemaCache := mcp.NewSchemaCache()
+./pkg/http/handler.go:124:		schemaCache:            schemaCache,
+./pkg/http/handler.go:207:		RepoAccessTTL:     h.config.RepoAccessCacheTTL,
+./pkg/http/handler.go:216:				so.SchemaCache = h.schemaCache
+./pkg/http/server.go:75:	// RepoAccessCacheTTL overrides the default TTL for repository access cache entries.
+./pkg/http/server.go:76:	RepoAccessCacheTTL *time.Duration
+./pkg/http/server.go:136:	if cfg.RepoAccessCacheTTL != nil {
+./pkg/http/server.go:137:		repoAccessOpts = append(repoAccessOpts, lockdown.WithTTL(*cfg.RepoAccessCacheTTL))
+./pkg/lockdown/lockdown_test.go:100:func newMockRepoAccessCache(t *testing.T, ttl time.Duration) (*RepoAccessCache, *countingTransport) {
+./pkg/lockdown/lockdown_test.go:104:	cache := NewRepoAccessCache(
+./pkg/lockdown/lockdown_test.go:108:		WithCacheName(t.Name()),
+./pkg/lockdown/lockdown_test.go:110:	return cache, counting
+./pkg/lockdown/lockdown_test.go:113:func TestRepoAccessCacheEvictsAfterTTL(t *testing.T) {
+./pkg/lockdown/lockdown_test.go:116:	cache, transport := newMockRepoAccessCache(t, 5*time.Millisecond)
+./pkg/lockdown/lockdown_test.go:117:	info, err := cache.getRepoAccessInfo(ctx, testUser, testOwner, testRepo)
+./pkg/lockdown/lockdown_test.go:125:	info, err = cache.getRepoAccessInfo(ctx, testUser, testOwner, testRepo)
+./pkg/lockdown/lockdown_test.go:132:func TestRepoAccessCacheIsolatesViewerPerInstance(t *testing.T) {
+./pkg/lockdown/lockdown_test.go:135:	cacheName := t.Name()
+./pkg/lockdown/lockdown_test.go:139:	attackerCache := NewRepoAccessCache(attackerGQL, restClient, WithCacheName(cacheName))
+./pkg/lockdown/lockdown_test.go:140:	safe, err := attackerCache.IsSafeContent(ctx, "attacker", testOwner, testRepo)
+./pkg/lockdown/lockdown_test.go:145:	victimCache := NewRepoAccessCache(victimGQL, restClient, WithCacheName(cacheName))
+./pkg/lockdown/lockdown_test.go:146:	safe, err = victimCache.IsSafeContent(ctx, "attacker", testOwner, testRepo)
+./pkg/lockdown/lockdown_test.go:150:	safe, err = victimCache.IsSafeContent(ctx, "victim", testOwner, testRepo)
+./pkg/lockdown/lockdown_test.go:173:func TestRepoAccessCacheRetriesViewerLoginAfterTransientError(t *testing.T) {
+./pkg/lockdown/lockdown_test.go:189:	cache := NewRepoAccessCache(gqlClient, nil, WithCacheName(t.Name()))
+./pkg/lockdown/lockdown_test.go:191:	_, err := cache.viewerLoginFor(ctx)
+./pkg/lockdown/lockdown_test.go:194:	login, err := cache.viewerLoginFor(ctx)
+./pkg/lockdown/lockdown_test.go:195:	require.NoError(t, err, "second call must retry, not return the cached error")
+./pkg/lockdown/lockdown_test.go:199:func TestRepoAccessCacheRejectsEmptyViewerLogin(t *testing.T) {
+./pkg/lockdown/lockdown_test.go:213:	cache := NewRepoAccessCache(gqlClient, nil, WithCacheName(t.Name()))
+./pkg/lockdown/lockdown_test.go:215:	_, err := cache.viewerLoginFor(ctx)
+./pkg/lockdown/lockdown.go:13:	"github.com/muesli/cache2go"
+./pkg/lockdown/lockdown.go:17:// RepoAccessCache caches repository metadata related to lockdown checks so that
+./pkg/lockdown/lockdown.go:21:type RepoAccessCache struct {
+./pkg/lockdown/lockdown.go:24:	cache            *cache2go.CacheTable
+./pkg/lockdown/lockdown.go:33:type repoAccessCacheEntry struct {
+./pkg/lockdown/lockdown.go:46:	defaultRepoAccessCacheKey = "repo-access-cache"
+./pkg/lockdown/lockdown.go:49:// RepoAccessOption configures RepoAccessCache at construction time.
+./pkg/lockdown/lockdown.go:50:type RepoAccessOption func(*RepoAccessCache)
+./pkg/lockdown/lockdown.go:52:// WithTTL overrides the default TTL applied to cache entries. A non-positive
+./pkg/lockdown/lockdown.go:55:	return func(c *RepoAccessCache) {
+./pkg/lockdown/lockdown.go:60:// WithLogger sets the logger used for cache diagnostics.
+./pkg/lockdown/lockdown.go:62:	return func(c *RepoAccessCache) {
+./pkg/lockdown/lockdown.go:67:// WithCacheName overrides the cache table name used for storing entries.
+./pkg/lockdown/lockdown.go:68:// Use this to isolate cache entries between tenants or in tests.
+./pkg/lockdown/lockdown.go:69:func WithCacheName(name string) RepoAccessOption {
+./pkg/lockdown/lockdown.go:70:	return func(c *RepoAccessCache) {
+./pkg/lockdown/lockdown.go:72:			c.cache = cache2go.Cache(name)
+./pkg/lockdown/lockdown.go:77:// NewRepoAccessCache creates a RepoAccessCache bound to the supplied clients.
+./pkg/lockdown/lockdown.go:78:func NewRepoAccessCache(client *githubv4.Client, restClient *github.Client, opts ...RepoAccessOption) *RepoAccessCache {
+./pkg/lockdown/lockdown.go:79:	c := &RepoAccessCache{
+./pkg/lockdown/lockdown.go:82:		cache:      cache2go.Cache(defaultRepoAccessCacheKey),
+./pkg/lockdown/lockdown.go:97:// CacheStats summarizes cache activity counters.
+./pkg/lockdown/lockdown.go:98:type CacheStats struct {
+./pkg/lockdown/lockdown.go:110:func (c *RepoAccessCache) IsSafeContent(ctx context.Context, username, owner, repo string) (bool, error) {
+./pkg/lockdown/lockdown.go:112:		return false, fmt.Errorf("nil repo access cache")
+./pkg/lockdown/lockdown.go:141:func (c *RepoAccessCache) viewerLoginFor(ctx context.Context) (string, error) {
+./pkg/lockdown/lockdown.go:166:// setViewerLogin seeds the cached viewer login from a piggy-backed query response.
+./pkg/lockdown/lockdown.go:167:func (c *RepoAccessCache) setViewerLogin(login string) {
+./pkg/lockdown/lockdown.go:178:func (c *RepoAccessCache) getRepoAccessInfo(ctx context.Context, username, owner, repo string) (RepoAccessInfo, error) {
+./pkg/lockdown/lockdown.go:180:		return RepoAccessInfo{}, fmt.Errorf("nil repo access cache")
+./pkg/lockdown/lockdown.go:183:	key := cacheKey(owner, repo)
+./pkg/lockdown/lockdown.go:186:	// Entries are immutable once added: the cache table is shared across instances,
+./pkg/lockdown/lockdown.go:188:	if cacheItem, err := c.cache.Value(key); err == nil {
+./pkg/lockdown/lockdown.go:189:		entry := cacheItem.Data().(*repoAccessCacheEntry)
+./pkg/lockdown/lockdown.go:190:		if cachedHasPush, known := entry.knownUsers[userKey]; known {
+./pkg/lockdown/lockdown.go:191:			c.logDebug(ctx, fmt.Sprintf("repo access cache hit for user %s to %s/%s", username, owner, repo))
+./pkg/lockdown/lockdown.go:194:				HasPushAccess: cachedHasPush,
+./pkg/lockdown/lockdown.go:198:		c.logDebug(ctx, "known users cache miss, fetching permission")
+./pkg/lockdown/lockdown.go:208:		c.cache.Add(key, c.ttl, &repoAccessCacheEntry{
+./pkg/lockdown/lockdown.go:219:	c.logDebug(ctx, fmt.Sprintf("repo access cache miss for user %s to %s/%s", username, owner, repo))
+./pkg/lockdown/lockdown.go:232:	c.cache.Add(key, c.ttl, &repoAccessCacheEntry{
+./pkg/lockdown/lockdown.go:244:func (c *RepoAccessCache) queryRepoAccessInfo(ctx context.Context, owner, repo string) (bool, string, error) {
+./pkg/lockdown/lockdown.go:273:func (c *RepoAccessCache) checkPushAccess(ctx context.Context, username, owner, repo string) (bool, error) {
+./pkg/lockdown/lockdown.go:289:func (c *RepoAccessCache) log(ctx context.Context, level slog.Level, msg string, attrs ...slog.Attr) {
+./pkg/lockdown/lockdown.go:299:func (c *RepoAccessCache) logDebug(ctx context.Context, msg string, attrs ...slog.Attr) {
+./pkg/lockdown/lockdown.go:303:func (c *RepoAccessCache) isTrustedBot(username string) bool {
+./pkg/lockdown/lockdown.go:308:func cacheKey(owner, repo string) string {
+=== 9. endpoint check ===
+./cmd/github-mcp-server/generate_docs.go:379:	fmt.Fprintf(&buf, "| %s<br>`default` | Default toolset | https://api.githubcopilot.com/mcp/ | [Install](https://insiders.vscode.dev/redirect/mcp/install?name=github&config=%%7B%%22type%%22%%3A%%20%%22http%%22%%2C%%22url%%22%%3A%%20%%22https%%3A%%2F%%2Fapi.githubcopilot.com%%2Fmcp%%2F%%22%%7D) | [read-only](https://api.githubcopilot.com/mcp/readonly) | [Install read-only](https://insiders.vscode.dev/redirect/mcp/install?name=github&config=%%7B%%22type%%22%%3A%%20%%22http%%22%%2C%%22url%%22%%3A%%20%%22https%%3A%%2F%%2Fapi.githubcopilot.com%%2Fmcp%%2Freadonly%%22%%7D) |\n", metaIcon)
+./cmd/github-mcp-server/generate_docs.go:380:	fmt.Fprintf(&buf, "| %s<br>`all` | All available GitHub MCP tools | https://api.githubcopilot.com/mcp/x/all | [Install](https://insiders.vscode.dev/redirect/mcp/install?name=gh-all&config=%%7B%%22type%%22%%3A%%20%%22http%%22%%2C%%22url%%22%%3A%%20%%22https%%3A%%2F%%2Fapi.githubcopilot.com%%2Fmcp%%2Fx%%2Fall%%22%%7D) | [read-only](https://api.githubcopilot.com/mcp/x/all/readonly) | [Install read-only](https://insiders.vscode.dev/redirect/mcp/install?name=gh-all&config=%%7B%%22type%%22%%3A%%20%%22http%%22%%2C%%22url%%22%%3A%%20%%22https%%3A%%2F%%2Fapi.githubcopilot.com%%2Fmcp%%2Fx%%2Fall%%2Freadonly%%22%%7D) |\n", metaIcon)
+./cmd/github-mcp-server/generate_docs.go:387:		apiURL := fmt.Sprintf("https://api.githubcopilot.com/mcp/x/%s", idStr)
+./cmd/github-mcp-server/generate_docs.go:388:		readonlyURL := fmt.Sprintf("https://api.githubcopilot.com/mcp/x/%s/readonly", idStr)
+./cmd/github-mcp-server/generate_docs.go:427:		apiURL := fmt.Sprintf("https://api.githubcopilot.com/mcp/x/%s", idStr)
+./cmd/github-mcp-server/generate_docs.go:428:		readonlyURL := fmt.Sprintf("https://api.githubcopilot.com/mcp/x/%s/readonly", idStr)
+./cmd/github-mcp-server/main.go:46:			// GITHUB_HOST=github.com (or api.github.com) still counts as the default and keeps
+./internal/oauth/oauth.go:66:// the web host, not the API host (api.github.com -> github.com). An empty host
+./pkg/utils/token.go:55:		// support both "Bearer" and "bearer" to conform to api.github.com
+./pkg/utils/api.go:62:	baseRestURL, err := url.Parse("https://api.github.com/")
+./pkg/utils/api.go:67:	gqlURL, err := url.Parse("https://api.github.com/graphql")
+./pkg/utils/api.go:82:	// The authorization server for GitHub.com is at github.com/login/oauth, not api.github.com
+./pkg/github/issues.go:1765:// URL of the form https://api.github.com/repos/{owner}/{repo}.
+./pkg/http/oauth/oauth.go:83:		apiHost, err = utils.NewAPIHost("https://api.github.com")
+./pkg/scopes/fetcher.go:27:	// APIHost is the GitHub API host (e.g., "https://api.github.com").
+./pkg/scopes/fetcher.go:28:	// Defaults to "https://api.github.com" if empty.
+./pkg/scopes/fetcher.go:125:	apiHost, err := utils.NewAPIHost("https://api.github.com/")
