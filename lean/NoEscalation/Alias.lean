@@ -97,7 +97,10 @@ theorem Step_alias_preserved {cfg ev cfg'}
         | inr hnew =>
           subst hnew
           by_cases hc : S.caretaker m.sender
-          · -- caretaker sender: MembraneOK covers the newly pending message
+          · -- caretaker sender: MembraneOK covers the NEWLY pending message;
+            -- if it was already pending, clause B covers it. (The split is
+            -- the mechanization-discovered subtlety: Membrane's promise binds
+            -- only fresh messages.)
             by_cases hpend : cfg.inflight m
             · exact hinv.inflight m k hpend hk
             · exact hmem m hpend (Or.inr rfl) hc k hk
@@ -119,6 +122,8 @@ theorem Step_alias_preserved {cfg ev cfg'}
   | endTurn hphase =>
       exact ⟨hinv.stores, hinv.inflight⟩
   | narrow hnar =>
+      exact ⟨hinv.stores, hinv.inflight⟩
+  | narrowFilter hnar =>
       exact ⟨hinv.stores, hinv.inflight⟩
 
 /-- Lift to the mixed relation (mechanical, per the Step_bound_antitone

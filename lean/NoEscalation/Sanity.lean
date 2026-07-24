@@ -43,9 +43,11 @@ def capBad  : Cap Ef := ⟨fun e => e = .bad⟩
 /-- Root context: alice confers only `good`. -/
 def π₀ : Ctx Ef Cp := .root .alice goodOnly
 
-/-- The root request from alice to bob (no payload). -/
+/-- The root request from alice to bob (no payload). `stamp` is irrelevant
+here (no caretakers in this scenario); ⊤ is the neutral choice. -/
 def m₀ : Msg Ef Cp :=
-  { sender := .alice, target := .bob, ctx := π₀, payload := fun _ => False }
+  { sender := .alice, target := .bob, ctx := π₀, payload := fun _ => False,
+    stamp := fun _ => True }
 
 /-- The B2 shape: bob (a shared service) legitimately holds BOTH
 capabilities — `capGood` matching the conferral and `capBad` from elsewhere —
@@ -55,13 +57,16 @@ def init : Config Ef Cp :=
     bound    := fun _ _ => True
     inflight := fun m => m = m₀
     live     := fun _ => False
-    phase    := .idle }
+    phase    := .idle
+    filters  := fun _ _ => True
+    issued   := fun _ => True }
 
 /-- Deliver m₀: bob's turn opens under alice's narrow context.
 Trace is [] (delivery is silent). -/
 private theorem reach₁ :
     Reaches init [] { init with
       phase    := .active m₀.target m₀.ctx
+      issued   := m₀.stamp
       inflight := fun m' => init.inflight m' ∧ m' ≠ m₀
       store    := fun c k => init.store c k ∨ (c = m₀.target ∧ m₀.payload k) } :=
   Reaches.step (Step.startMsg rfl rfl) (Reaches.refl _)

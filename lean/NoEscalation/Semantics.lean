@@ -27,17 +27,23 @@ variable {E : Type u} {Comp : Type v}
 structure Cap (E : Type u) : Type u where
   denotes : ESet E
 
-/-- Messages carry semantic contexts and capability payloads (v1.0 §2–§3). -/
+/-- Messages carry semantic contexts, capability payloads, and (T4) the
+issuance stamp: the target's filter as of this send. -/
 structure Msg (E : Type u) (Comp : Type v) : Type (max u v) where
   sender  : Comp
   target  : Comp
   ctx     : Ctx E Comp
   payload : Cap E → Prop
+  stamp   : ESet E
 
-/-- A resolver/continuation: captures its creation context (D2 rule 3). -/
+/-- A resolver/continuation: captures its creation context (D2 rule 3).
+`stamp` is CREATION-time — i.e. the rule C1 refuted. T4 excludes
+resolver-triggered turns by hypothesis; the `invokeRes` extension
+(invoker-turn licensing) is the named follow-on. -/
 structure Res (E : Type u) (Comp : Type v) : Type (max u v) where
   host     : Comp
   captured : Ctx E Comp
+  stamp    : ESet E
 
 /-- Turn lock: `active p π` = component `p` is mid-turn under context `π`. -/
 inductive Phase (E : Type u) (Comp : Type v) : Type (max u v) where
@@ -52,6 +58,12 @@ structure Config (E : Type u) (Comp : Type v) : Type (max u v) where
   inflight : Msg E Comp → Prop
   live     : Res E Comp → Prop
   phase    : Phase E Comp
+  /-- T4/D1: per-component revocation filter; narrows only. Meaningful for
+  caretakers, unconstrained elsewhere. -/
+  filters  : Comp → ESet E
+  /-- T4/D2: the issuance stamp of the currently open turn, set when the turn
+  opens from its trigger. Irrelevant while idle. -/
+  issued   : ESet E
 
 /-- Observable events: effect occurrences with performer and context. -/
 inductive Ev (E : Type u) (Comp : Type v) : Type (max u v) where
@@ -70,14 +82,16 @@ inductive Step : Config E Comp → Option (Ev E Comp) → Config E Comp → Prop
       Step cfg none
         { cfg with
           phase    := .active m.target m.ctx
+          issued   := m.stamp                         -- T4/D2
           inflight := fun m' => cfg.inflight m' ∧ m' ≠ m
           store    := fun c k => cfg.store c k ∨ (c = m.target ∧ m.payload k) }
   | startRes {cfg : Config E Comp} {r : Res E Comp} :
       cfg.phase = .idle → cfg.live r →
       Step cfg none
         { cfg with
-          phase := .active r.host r.captured
-          live  := fun r' => cfg.live r' ∧ r' ≠ r }   -- linearity: consumed
+          phase  := .active r.host r.captured
+          issued := r.stamp                           -- CREATION-time: see D3
+          live   := fun r' => cfg.live r' ∧ r' ≠ r }   -- linearity: consumed
   | perform {cfg : Config E Comp} {p : Comp} {π : Ctx E Comp} {e : E} :
       cfg.phase = .active p π →
       (∃ k, cfg.store p k ∧ k.denotes e) →
@@ -88,6 +102,7 @@ inductive Step : Config E Comp → Option (Ev E Comp) → Config E Comp → Prop
       m.sender = p →
       m.ctx = .hop π p β →                      -- D2 rule 2: context extension
       (∀ k, m.payload k → cfg.store p k) →      -- A1: only send what you hold
+      m.stamp = cfg.filters m.target →          -- T4/D2: stamp at issuance
       Step cfg none
         { cfg with inflight := fun m' => cfg.inflight m' ∨ m' = m }
   | mkRes {cfg : Config E Comp} {p : Comp} {π : Ctx E Comp} {r : Res E Comp} :
@@ -101,6 +116,9 @@ inductive Step : Config E Comp → Option (Ev E Comp) → Config E Comp → Prop
   | narrow {cfg : Config E Comp} {b' : Comp → ESet E} :
       (∀ c, ESet.Sub (b' c) (cfg.bound c)) →    -- A4: bounds only narrow
       Step cfg none { cfg with bound := b' }
+  | narrowFilter {cfg : Config E Comp} {f' : Comp → ESet E} :
+      (∀ c, ESet.Sub (f' c) (cfg.filters c)) →  -- T4/D1: filters only narrow
+      Step cfg none { cfg with filters := f' }
 
 /-- Multi-step reachability, accumulating the event trace. -/
 inductive Reaches : Config E Comp → List (Ev E Comp) → Config E Comp → Prop where
