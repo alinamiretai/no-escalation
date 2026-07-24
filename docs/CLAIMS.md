@@ -37,8 +37,11 @@ A CHECKED row is **not** a proved row. Bounded scopes are evidence, not proof. E
 | T4d | Filters only narrow | PROVED | `Revocation.Step_filter_antitone`, `MStep_filter_antitone` |
 | **T4** | **Revocation effectiveness (strong/quiesced): no underlying-only effect outside F is ever performed, for message- AND resolver-triggered turns** | **PROVED** | `Revocation.T4_effectiveness`, via `RevInv_along`; supporting: `NoStaleLicense_preserved`, `RevInv_step`, `IssuedOK`, `InvokedOK` |
 | T4e | Issuance for a resumed continuation is fixed at the **invoker's** turn | PROVED + CHECKED (8) | `Semantics.Step.invokeRes` + `Revocation.InvokedOK`; `resolver_issuance.als` C1/C2/C3 |
+| T2u | **Graceful degradation**: with a declared unmediated set U, every effect *outside* U still satisfies effbound — composition survives partial mediation, still with no induction | PROVED | `Degradation.T2_modulo_U`; full mediation recovered as `T2_of_empty_U` |
 | T5 | Guard and Membrane protect **different** theorems: NE can hold while revocation fails | CHECKED (5) | `alias_v11.als`: `T4_fails_NE_holds` SAT — the reason T4 is not a corollary of monotone filters |
 | T4f | **A3 is satisfiable**: a caretaker can discharge Guard + Membrane + filtered forwarding *simultaneously* and still perform the resource effect — so T4 is not vacuous for caretakers | PROVED | `CareSanity.contracts_livable` (unbounded); `alias_v11.als` `AV_Live` SAT (scope 5) |
+| T7 | **NE composes under concurrency**: over a *shared store* with a set of simultaneously-active turns and interfering narrows, every performed effect satisfies effbound | PROVED | `Concurrent.CNE_holds` — the spatial property is not an artifact of turn-based semantics |
+| T7-lim | The sequential **start-of-run** bound invariant (T3b) does **not** transfer to concurrency: only the *current* bound is guaranteed, since a concurrent narrow can intervene between a turn opening and its effect | STATED (open) | `Concurrent.CNE_startbound` (the non-transferring statement); direction of failure is safe (bounds only shrink), but T4's temporal reasoning needs an explicit happens-before order the concurrent model lacks |
 | T6 | Chain- and history-based access control are **incomparable** | CHECKED (6) | `history_vs_chain.als`: `D3_BothFlag`, `D1_HistoryOverRestricts`, `D2_HistoryMissesDeputy` all SAT |
 
 ---
@@ -66,7 +69,7 @@ A CHECKED row is **not** a proved row. Bounded scopes are evidence, not proof. E
 | A2 | Provenance contexts are framework-constructed and unforgeable by components | R2: framework-owned request tracing; components cannot synthesise π |
 | A3 | Trusted components discharge their contracts: Guard (all), Membrane + monotone filtered forwarding (caretakers) | R3: deputy performs its own effbound check; proxy never returns underlying handles |
 | A4 | Component bounds only narrow | R4: no bound-widening API |
-| A5 | **Mediation**: untrusted components have no actuators outside the framework | R5: no direct egress from untrusted components — *the load-bearing realism assumption; cf. Flume's confined/unconfined split* |
+| A5 | **Mediation**: untrusted components have no actuators outside the framework. *Weakened by T2u:* not required outright — a declared unmediated set U is permitted, and the guarantee holds on E \ U | R5: **enumerate** U; do not assume it empty. *cf. Flume's confined/unconfined split* |
 | A6 | E is at tool-invocation granularity; sub-effect traffic is implementation | R6: enforcement point sits at the tool-call boundary |
 
 ---

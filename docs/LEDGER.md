@@ -78,3 +78,19 @@ Three packet claims failed verification and were rewritten: SAFKASI called "sequ
 `invokeRes` closes it. Issuance is now fixed at the invoker's turn by construction, and A6 is replaced by `InvokedOK` — a proved invariant (invocation stamps with the current filter; filters only narrow) rather than a hypothesis. Continuations are covered by T4 instead of excluded from it.
 
 **Lesson:** a scoping assumption introduced to route around a known-wrong encoding is a deferred error, not a scoping decision. It survived two sessions and three artifacts (memo D3, the `RevInv` bundle, the CLAIMS A-table) before being discharged. Naming it in CLAIMS as *temporary* is what kept it visible.
+
+---
+
+## L13 — The concurrency test, and what it found (a limitation, not an error)
+
+Not a falsification — a deliberate stress test of the suspicion, raised repeatedly, that turn-locality might be an artifact of the turn-based semantics rather than a fact about the domain.
+
+**The test:** a concurrent model — a *set* of simultaneously-active turns over a *shared* store, with `narrow` shrinking a shared bound while other turns run. Genuine overlap, not lock-serialised interleaving (which would have re-imposed the very locality under test and proved nothing).
+
+**Result — two-sided, and that is the point:**
+- **NE survives (`CNE_holds`, one line).** The spatial property holds because effbound reads only the performer's own bound and its own message-carried context; no concurrent turn can widen them. Turn-locality of the *spatial* guarantee is real, not an encoding artifact.
+- **The temporal invariant does not transfer (`CNE_startbound`).** The sequential `mixed_NES` proved effects stay within the *start-of-run* bound; under concurrency only the *current* bound is guaranteed, because a concurrent narrow can intervene. The failure direction is safe (bounds only shrink), but the happens-before order T4's revocation argument relies on is absent from the concurrent model.
+
+**Why this is the most valuable entry in the file.** Every earlier item was a prose error caught by a checker — real, but definitional in flavour. This is a genuine structural fact about the problem: authority confinement composes under concurrency; revocation effectiveness under concurrency is open and needs explicit ordering. It is the first result that is hard in the way that matters, and it was found by building the adversarial model rather than by trusting the easy one.
+
+**For the paper:** claim NE's concurrency-robustness as a strength; state the temporal-transfer gap as declared future work. Do not paper over it — it is the honest boundary of the current contribution, and stating it is what makes the strength credible.
