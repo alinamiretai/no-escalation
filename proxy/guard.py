@@ -30,7 +30,7 @@ import subprocess
 from datetime import datetime, timezone
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from provenance import Chain, Rule, Constraint, META_KEY, attach_to_meta
+from provenance import Chain, Rule, Constraint, META_KEY, attach_to_meta, read_from_meta
 
 
 def log(msg: str):
@@ -58,14 +58,22 @@ class Guard:
         name = params.get("name")
         arguments = params.get("arguments", {})
 
-        # CONSTRUCT: attach the host's conferral as pi. (Single-hop here; a
-        # multi-agent host would extend an inbound chain instead.)
-        chain = Chain().extend(self.host_component, self.host_bound)
+        # CONSTRUCT (multi-hop): if an inbound pi is already present, EXTEND it
+        # with this component's attached bound; otherwise start a fresh chain.
+        # This is the delegation case — the accumulated meet across all hops is
+        # what T3 (chain conferral) is about, and rejecting on it is composition,
+        # not just single-hop confinement.
+        inbound = read_from_meta(message)
+        if inbound is not None:
+            chain = inbound.extend(self.host_component, self.host_bound)
+            log(f"extend chain: {len(inbound.hops)} -> {len(chain.hops)} hops")
+        else:
+            chain = Chain().extend(self.host_component, self.host_bound)
         attach_to_meta(message, chain)
 
-        # CHECK: is this call within effbound?
+        # CHECK: is this call within effbound (the meet across EVERY hop)?
         if chain.admits(name, arguments):
-            log(f"ALLOW {name} {json.dumps(arguments)}")
+            log(f"ALLOW {name} {json.dumps(arguments)}  ({len(chain.hops)} hops)")
             return message, None
 
         # violation
