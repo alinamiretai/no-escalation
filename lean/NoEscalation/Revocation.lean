@@ -129,16 +129,62 @@ theorem NoStaleLicense_preserved {F : ESet E} {cfg ev cfg'}
   | narrow _     => exact h m hm hc
   | narrowFilter _ => exact h m hm hc
   | send hphase hsender hctx hpay hstamp =>
-      -- `hm : cfg.inflight m ∨ m = m✝`; the left disjunct is `h`, the right
-      -- needs `hstamp` (stamp = current filter) plus `hfil` (filter ⊆ F).
-      sorry
+      -- `hm : cfg.inflight m ∨ m = <the new message>`
+      cases hm with
+      | inl hold => exact h m hold hc
+      | inr hnew =>
+          subst hnew
+          rw [hstamp]
+          exact hfil _ hc
+      -- CHECK: if `subst hnew` objects to the orientation, use
+      --   `rw [hnew] at hc ⊢; rw [hstamp]; exact hfil _ hc`
   -- CHECK: if the anonymous-constructor cases mismatch (`hm` shape differs per
   -- constructor because `inflight` is updated differently), split with
   -- `cases hm with | inl … | inr …` inside the `send` branch only.
 
+/-! ### The remaining conjuncts (surfaced by attempting the induction) -/
+
+/--
+The open turn's issuance stamp is inside `F` — **conditionally on the turn's
+performer being a caretaker**. The condition is necessary: turns opened at
+non-caretakers carry unconstrained stamps, and nothing needs them.
+
+This conjunct was not in the memo. Attempting the induction produced it: T4a
+gives `cfg.issued e`, and to conclude `F e` you need `issued ⊆ F`, which is a
+property of *how the turn opened*, not of the performing step.
+-/
+def IssuedOK (F : ESet E) (cfg : Config E Comp) : Prop :=
+  ∀ p π, cfg.phase = Phase.active p π → S.caretaker p → ESet.Sub cfg.issued F
+
+/--
+**D3 made load-bearing.** No live resolver is hosted at a caretaker.
+
+Why this is needed and not merely tidy: `startRes` stamps `issued` from the
+resolver's *creation* turn — the rule C1 refuted — so a caretaker resuming a
+continuation would carry an unconstrained stamp and `IssuedOK` would fail.
+The memo scoped resolvers out "by hypothesis"; this is that hypothesis, named.
+Discharging it properly means implementing `invokeRes` (invoker-turn
+licensing), after which this predicate can be deleted.
+-/
+def NoCareRes (cfg : Config E Comp) : Prop :=
+  ∀ r : Res E Comp, cfg.live r → ¬ S.caretaker r.host
+
+/-- Delta-style step obligation keeping `NoCareRes` true: no newly-live
+resolver is hosted at a caretaker. (Same shape as `MembraneOK`.) -/
+def NoCareResOK (cfg cfg' : Config E Comp) : Prop :=
+  ∀ r : Res E Comp, ¬ cfg.live r → cfg'.live r → ¬ S.caretaker r.host
+
+/-- The full T4 invariant. -/
+structure RevInv (F : ESet E) (cfg : Config E Comp) : Prop where
+  alias  : Alias.AliasInv S cfg
+  filt   : FiltersIn S F cfg
+  stale  : NoStaleLicense S F cfg
+  issued : IssuedOK S F cfg
+  nocare : NoCareRes S cfg
+
 /-! ### T4 — effectiveness -/
 
-/-- A trace respecting both trusted-component contracts in play. -/
+/-- A trace respecting every trusted-component obligation in play. -/
 inductive RevTrace (F : ESet E) :
     Config E Comp → List (Ev E Comp) → Config E Comp → Prop where
   | refl (cfg) : RevTrace F cfg [] cfg
@@ -146,34 +192,119 @@ inductive RevTrace (F : ESet E) :
       Guarded.MStep S.toSystem cfg₁ ev cfg₂ →
       Alias.MembraneOK S cfg₁ cfg₂ →
       FilteredOK S cfg₁ ev →
+      NoCareResOK S cfg₁ cfg₂ →
       RevTrace F cfg₂ tr cfg₃ →
       RevTrace F cfg₁ (ev.toList ++ tr) cfg₃
 
 /--
+Preservation of the bundle across one *unguarded* step (lifted below).
+Four conjuncts are already discharged elsewhere; the two new ones are here.
+
+`IssuedOK`'s `startMsg` case is the mathematical content: the opening message
+targeted a caretaker, so `NoStaleLicense` puts its stamp inside `F`, and
+`issued` is that stamp. Left as the exercise — it is the last case in the
+project with real content.
+-/
+theorem RevInv_step {F : ESet E} {cfg ev cfg'}
+    (hs : Step cfg ev cfg')
+    (hmem : Alias.MembraneOK S cfg cfg')
+    (hres : NoCareResOK S cfg cfg')
+    (h : RevInv S F cfg) : RevInv S F cfg' := by
+  refine ⟨Alias.Step_alias_preserved S hs hmem h.alias,
+          FiltersIn_preserved S hs h.filt,
+          NoStaleLicense_preserved S hs h.filt h.stale,
+          ?_, ?_⟩
+  · -- IssuedOK
+    intro p π hphase hc
+    cases hs with
+    | startMsg _ hin =>
+        -- The turn opened from a pending message; `hphase` identifies the
+        -- performer as its target, so `hc` makes that target a caretaker, and
+        -- `NoStaleLicense` puts its stamp inside F. `issued` IS that stamp.
+        simp only [Phase.active.injEq] at hphase
+        obtain ⟨hp, _⟩ := hphase
+        subst hp
+        exact h.stale _ hin hc
+    | startRes _ hlive =>
+        -- The performer is the resolver's host, which `NoCareRes` (A6) says
+        -- is not a caretaker — contradicting `hc`.
+        simp only [Phase.active.injEq] at hphase
+        obtain ⟨hp, _⟩ := hphase
+        subst hp
+        exact absurd hc (h.nocare _ hlive)
+    -- CHECK: if `simp only [Phase.active.injEq]` does not fire, the projection
+    -- may need forcing first — `have hq : Phase.active _ _ = Phase.active p π
+    -- := hphase; injection hq with hp _` is the manual route.
+    | perform _ _ => exact h.issued p π hphase hc
+    | send _ _ _ _ _ => exact h.issued p π hphase hc
+    | mkRes _ _ _ => exact h.issued p π hphase hc
+    | endTurn _ =>
+        have hcon : Phase.idle = Phase.active p π := hphase
+        simp at hcon
+    | narrow _ => exact h.issued p π hphase hc
+    | narrowFilter _ => exact h.issued p π hphase hc
+  · -- NoCareRes
+    intro r hlive
+    by_cases hold : cfg.live r
+    · exact h.nocare r hold
+    · exact hres r hold hlive
+  -- CHECK: the non-opening cases assume `phase`/`issued` reduce definitionally
+  -- through `{cfg with …}`. If a case balks, `simpa using h.issued p π hphase hc`.
+
+theorem RevInv_mstep {F : ESet E} {cfg ev cfg'}
+    (hs : Guarded.MStep S.toSystem cfg ev cfg')
+    (hmem : Alias.MembraneOK S cfg cfg')
+    (hres : NoCareResOK S cfg cfg')
+    (h : RevInv S F cfg) : RevInv S F cfg' := by
+  cases hs with
+  | untrusted hg _ => cases hg with
+    | lift hstep _ => exact RevInv_step S hstep hmem hres h
+  | trusted hstep _ => exact RevInv_step S hstep hmem hres h
+
+/-- The bundle survives a whole trace. -/
+theorem RevInv_along {F : ESet E} {init : Config E Comp}
+    (h : RevInv S F init) :
+    ∀ tr cfg, RevTrace S F init tr cfg → RevInv S F cfg := by
+  intro tr cfg hr
+  induction hr with
+  | refl _ => exact h
+  | step hstep hmem _ hres _ ih => exact ih (RevInv_mstep S hstep hmem hres h)
+
+/--
 **T4 (revocation effectiveness, strong/quiesced form).**
 
-If at `cfg` alias-freedom holds, the caretaker filters are inside `F`, and no
-stale licenses are pending, then along every membrane- and filter-respecting
-trace, no effect outside `F` is ever performed.
+Given at `init`: alias-freedom, caretaker filters inside `F`, no stale
+licenses pending, the open turn's stamp inside `F`, and no caretaker-hosted
+resolvers (D3) — then along every membrane-, filter- and resolver-respecting
+trace, **no underlying-only effect outside `F` is ever performed**.
 
-Proof shape: induct along `RevTrace`, carrying the conjunction
-`AliasInv ∧ FiltersIn ∧ NoStaleLicense`; at an emitting step, split on whether
-the performer is a caretaker — non-caretaker is impossible by T4b, caretaker
-lands inside `issued`, and `issued` came from a stamp that `NoStaleLicense`
-puts inside `F`.
+The proof is the case split the whole development was built for: a
+non-caretaker performer is impossible by `T4b_sole_route` (alias-freedom), and
+a caretaker performer lands inside `issued ⊆ F` by `T4a` and `IssuedOK`.
 
-The last link (turn-opening carries the stamp into `cfg.issued`) is the one
-piece not yet stated as a lemma; it is the message-triggered analogue of the
-resolver gap in D3, and is the first thing to write next.
+Weak form (what the note adopts): drop `NoStaleLicense` from the hypotheses
+and the conclusion holds except for effects licensed by messages already in
+flight when the filter narrowed. That residual window is weak revocation
+working as designed, and belongs in the paper explicitly.
 -/
 theorem T4_effectiveness {F : ESet E} {init : Config E Comp}
-    (hinv : Alias.AliasInv S init)
-    (hfil : FiltersIn S F init)
-    (hstale : NoStaleLicense S F init) :
+    (h : RevInv S F init) :
     ∀ tr cfg, RevTrace S F init tr cfg →
-      ∀ p π e cfg', Guarded.MStep S.toSystem cfg (some (Ev.eff p π e)) cfg' →
+      ∀ p π e cfg', FilteredOK S cfg (some (Ev.eff p π e)) →
+        Step cfg (some (Ev.eff p π e)) cfg' →
         UnderlyingOnly S e → F e := by
-  sorry
+  intro tr cfg hr p π e cfg' hfilt hs hu
+  have hcfg : RevInv S F cfg := RevInv_along S h tr cfg hr
+  by_cases hc : S.caretaker p
+  · -- caretaker: T4a puts e in the stamp, IssuedOK puts the stamp in F
+    have hiss : cfg.issued e := T4a_within_issuance S hfilt hc
+    -- the performing step is in an open turn at p
+    cases hs with
+    | perform hphase _ => exact hcfg.issued p π hphase hc e hiss
+  · -- non-caretaker: impossible
+    exact absurd (T4b_sole_route S hcfg.alias hu hc hs) (by simp)
+  -- CHECK: the `absurd` step turns `False` into anything; if Lean objects,
+  -- `exact (T4b_sole_route S hcfg.alias hu hc hs).elim`.
 
 end Revocation
 end NoEscalation
