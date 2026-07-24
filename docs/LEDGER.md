@@ -68,3 +68,13 @@ Three packet claims failed verification and were rewritten: SAFKASI called "sequ
 1. **The definitions were made to fight.** Five substantive claims died; each replacement was re-checked, not merely re-asserted.
 2. **The instruments disagree with the author, repeatedly.** Alloy found L3, L5, L6, L7. Lean found L2, L9, L10. That is the argument for using both.
 3. **The failure mode is legible and specific.** It is not "reasoning errors" in general — it is *totality claims and theorem statements written in prose before a checker saw them*. Knowing the shape of one's own error mode is worth more than a lower error count.
+
+---
+
+## L12 — A6 discharged, not merely scoped
+
+**Recorded because it closes L5.** The resolver-issuance memo adopted invoker-turn licensing after C1 refuted creation-turn licensing — but the Lean encoding kept stamping from creation and excluded caretaker-hosted resolvers via an assumption (`NoCareRes`, A6). That is: the development contained a rule its own model checker had refuted, made harmless by a hypothesis.
+
+`invokeRes` closes it. Issuance is now fixed at the invoker's turn by construction, and A6 is replaced by `InvokedOK` — a proved invariant (invocation stamps with the current filter; filters only narrow) rather than a hypothesis. Continuations are covered by T4 instead of excluded from it.
+
+**Lesson:** a scoping assumption introduced to route around a known-wrong encoding is a deferred error, not a scoping decision. It survived two sessions and three artifacts (memo D3, the `RevInv` bundle, the CLAIMS A-table) before being discharged. Naming it in CLAIMS as *temporary* is what kept it visible.

@@ -35,8 +35,10 @@ A CHECKED row is **not** a proved row. Bounded scopes are evidence, not proof. E
 | T4c | Alias-freedom is preserved along membrane-respecting traces | PROVED | `Alias.Step_alias_preserved` → `MStep_alias_preserved` → `alias_free_along` |
 | T4c′ | Same, scope-bounded, under the **repaired** (v1.1) caretaker contract | CHECKED (5/5) | `alias_v11.als`: `AV_AliasPreserved` valid; `AV_SetupSat`/`AV_Live` SAT |
 | T4d | Filters only narrow | PROVED | `Revocation.Step_filter_antitone`, `MStep_filter_antitone` |
-| **T4** | **Revocation effectiveness (strong/quiesced): no underlying-only effect outside F is ever performed** | **PROVED** *(under A6 — see below)* | `Revocation.T4_effectiveness`, via `RevInv_along`; supporting: `NoStaleLicense_preserved`, `RevInv_step`, `IssuedOK` |
+| **T4** | **Revocation effectiveness (strong/quiesced): no underlying-only effect outside F is ever performed, for message- AND resolver-triggered turns** | **PROVED** | `Revocation.T4_effectiveness`, via `RevInv_along`; supporting: `NoStaleLicense_preserved`, `RevInv_step`, `IssuedOK`, `InvokedOK` |
+| T4e | Issuance for a resumed continuation is fixed at the **invoker's** turn | PROVED + CHECKED (8) | `Semantics.Step.invokeRes` + `Revocation.InvokedOK`; `resolver_issuance.als` C1/C2/C3 |
 | T5 | Guard and Membrane protect **different** theorems: NE can hold while revocation fails | CHECKED (5) | `alias_v11.als`: `T4_fails_NE_holds` SAT — the reason T4 is not a corollary of monotone filters |
+| T4f | **A3 is satisfiable**: a caretaker can discharge Guard + Membrane + filtered forwarding *simultaneously* and still perform the resource effect — so T4 is not vacuous for caretakers | PROVED | `CareSanity.contracts_livable` (unbounded); `alias_v11.als` `AV_Live` SAT (scope 5) |
 | T6 | Chain- and history-based access control are **incomparable** | CHECKED (6) | `history_vs_chain.als`: `D3_BothFlag`, `D1_HistoryOverRestricts`, `D2_HistoryMissesDeputy` all SAT |
 
 ---
@@ -65,8 +67,7 @@ A CHECKED row is **not** a proved row. Bounded scopes are evidence, not proof. E
 | A3 | Trusted components discharge their contracts: Guard (all), Membrane + monotone filtered forwarding (caretakers) | R3: deputy performs its own effbound check; proxy never returns underlying handles |
 | A4 | Component bounds only narrow | R4: no bound-widening API |
 | A5 | **Mediation**: untrusted components have no actuators outside the framework | R5: no direct egress from untrusted components — *the load-bearing realism assumption; cf. Flume's confined/unconfined split* |
-| A6 | **No caretaker-hosted live resolvers** (D3 scoping; surfaced by the T4 induction) | R6: — *temporary; deleted once `invokeRes` implements invoker-turn licensing* |
-| A7 | E is at tool-invocation granularity; sub-effect traffic is implementation | R7: enforcement point sits at the tool-call boundary |
+| A6 | E is at tool-invocation granularity; sub-effect traffic is implementation | R6: enforcement point sits at the tool-call boundary |
 
 ---
 
