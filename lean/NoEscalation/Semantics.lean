@@ -37,13 +37,11 @@ structure Msg (E : Type u) (Comp : Type v) : Type (max u v) where
   stamp   : ESet E
 
 /-- A resolver/continuation: captures its creation context (D2 rule 3).
-`stamp` is CREATION-time — i.e. the rule C1 refuted. T4 excludes
-resolver-triggered turns by hypothesis; the `invokeRes` extension
-(invoker-turn licensing) is the named follow-on. -/
+No stamp here — issuance is fixed at INVOCATION (`invokeRes`), per the
+resolver-issuance memo and C1/C2/C3. -/
 structure Res (E : Type u) (Comp : Type v) : Type (max u v) where
   host     : Comp
   captured : Ctx E Comp
-  stamp    : ESet E
 
 /-- Turn lock: `active p π` = component `p` is mid-turn under context `π`. -/
 inductive Phase (E : Type u) (Comp : Type v) : Type (max u v) where
@@ -64,6 +62,9 @@ structure Config (E : Type u) (Comp : Type v) : Type (max u v) where
   /-- T4/D2: the issuance stamp of the currently open turn, set when the turn
   opens from its trigger. Irrelevant while idle. -/
   issued   : ESet E
+  /-- Resolvers that have been invoked, paired with the stamp taken at the
+  moment of invocation (invoker-turn licensing). -/
+  invoked  : Res E Comp → ESet E → Prop
 
 /-- Observable events: effect occurrences with performer and context. -/
 inductive Ev (E : Type u) (Comp : Type v) : Type (max u v) where
@@ -85,13 +86,14 @@ inductive Step : Config E Comp → Option (Ev E Comp) → Config E Comp → Prop
           issued   := m.stamp                         -- T4/D2
           inflight := fun m' => cfg.inflight m' ∧ m' ≠ m
           store    := fun c k => cfg.store c k ∨ (c = m.target ∧ m.payload k) }
-  | startRes {cfg : Config E Comp} {r : Res E Comp} :
-      cfg.phase = .idle → cfg.live r →
+  | startRes {cfg : Config E Comp} {r : Res E Comp} {σ : ESet E} :
+      cfg.phase = .idle → cfg.live r → cfg.invoked r σ →
       Step cfg none
         { cfg with
-          phase  := .active r.host r.captured
-          issued := r.stamp                           -- CREATION-time: see D3
-          live   := fun r' => cfg.live r' ∧ r' ≠ r }   -- linearity: consumed
+          phase   := .active r.host r.captured
+          issued  := σ                                -- invoker-turn licensing
+          live    := fun r' => cfg.live r' ∧ r' ≠ r    -- linearity: consumed
+          invoked := fun r' σ' => cfg.invoked r' σ' ∧ r' ≠ r }
   | perform {cfg : Config E Comp} {p : Comp} {π : Ctx E Comp} {e : E} :
       cfg.phase = .active p π →
       (∃ k, cfg.store p k ∧ k.denotes e) →
@@ -113,6 +115,17 @@ inductive Step : Config E Comp → Option (Ev E Comp) → Config E Comp → Prop
   | endTurn {cfg : Config E Comp} {p : Comp} {π : Ctx E Comp} :
       cfg.phase = .active p π →
       Step cfg none { cfg with phase := .idle }
+  | invokeRes {cfg : Config E Comp} {p : Comp} {π : Ctx E Comp} {r : Res E Comp} :
+      cfg.phase = .active p π →
+      cfg.live r →
+      -- Issuance is fixed HERE, at the invoker's turn: the stamp is the
+      -- host's filter as it stands now. Creation-turn licensing was refuted
+      -- (resolver_issuance.als C1); resume-turn licensing is strong
+      -- revocation, inconsistent with the weak rule chosen for messages.
+      Step cfg none
+        { cfg with
+          invoked := fun r' σ =>
+            cfg.invoked r' σ ∨ (r' = r ∧ σ = cfg.filters r.host) }
   | narrow {cfg : Config E Comp} {b' : Comp → ESet E} :
       (∀ c, ESet.Sub (b' c) (cfg.bound c)) →    -- A4: bounds only narrow
       Step cfg none { cfg with bound := b' }

@@ -78,11 +78,12 @@ theorem Step_alias_preserved {cfg ev cfg'}
       · -- inflight: subset of the old pending set
         intro m k hm hk
         exact hinv.inflight m k hm.1 hk
-  | startRes hphase hlive =>
+  | startRes hphase hlive _ =>
       exact ⟨hinv.stores, hinv.inflight⟩
-      -- CHECK: startRes changes `live` and `phase` only; if the structure
-      -- update does not reduce definitionally under the anonymous
-      -- constructor, use `constructor <;> intro ... <;> exact hinv....`.
+      -- NB: the third hypothesis (the invocation stamp) is discarded — do NOT
+      -- name it `hinv`, which would shadow the AliasInv.
+  | invokeRes hphase hlive =>
+      exact ⟨hinv.stores, hinv.inflight⟩
   | perform hphase hcap =>
       exact hinv
   | send hphase hsender hctx hpay =>
