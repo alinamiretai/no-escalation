@@ -130,6 +130,30 @@ Complete, 9 of 10, all scope-bounded (≤ 6 turns) — "model-checked at scope N
 
 Model-driven findings fed back into this note: attribution unification (Benchmark 1); attached bounds and NE-D (Benchmark 2); continuation capture and the naive-reply refutation (D5); alias-freedom base case (v2 counterexample); the sub-effect principle and empty-housekeeping finding (item 6 / instantiation audit); the caretaker confused deputy and the resolver-issuance gap (v1.1). **Checklist 17/17 at v1.1; frozen.** Next phase: prior-art reads (Abadi–Fournet; Maffeis–Mitchell–Taly; DIFC; McCullough/Clarkson–Schneider re-verification), then Lean mechanization beginning with the kernel transcription and the NE-S ⇒ NE lemma.
 
+## 12. Post-freeze addendum (mechanization + concurrency)
+
+*The frozen text above is left unedited. This section records what the subsequent Lean mechanization and the concurrency test established, corrected, or left open. Where this addendum and the frozen text disagree, this addendum is current. Full claim ledger: `CLAIMS.md`; falsification record: `LEDGER.md`.*
+
+### 12.1 What mechanization confirmed
+Every live theorem of §8 is machine-checked in Lean 4 (Mathlib-free), with one deliberate `sorry` marking the *retracted* v1.0 target as provenance. Proved: NE-S⇒NE-T (T0), soundness (T1), mixed composition (T2), chain conferral (T3), bound antitonicity and mixed-system NES (T3a/b), the full revocation stack (T4a–f), graceful degradation (T2u). Both vacuity risks are closed: NE is refutable (`Sanity`), and the caretaker contracts are jointly satisfiable *while forwarding* (`CareSanity.contracts_livable`) — so T4 is not vacuous for caretakers.
+
+### 12.2 What mechanization corrected
+- **T2 needs no inductive invariant.** §8's prediction was false in the favourable direction: composition is three lines, because effbound is turn-local. The depth relocated to T4. (LEDGER L4.)
+- **A6 is discharged, not assumed.** The resolver case initially carried a scoping assumption (no caretaker-hosted resolvers) that existed only because the encoding still stamped from the *creation* turn — the rule §6 already refuted. `invokeRes` fixes issuance at the invoker's turn; the assumption is deleted and replaced by a proved invariant (`InvokedOK`). (LEDGER L12.)
+- **Membrane binds only fresh messages.** Mechanizing alias-freedom surfaced a case split invisible in §7's prose: the contract's forward-looking promise covers newly-pipelined messages; already-in-flight ones are covered by the invariant's history. (LEDGER L9.)
+
+### 12.3 The concurrency finding (the important one)
+§2's turn model assumes one active turn and no shared memory. A separate concurrent semantics (`Concurrent.lean`) tests whether the results depend on that: a **set** of simultaneously-active turns over a **shared** store, narrowing visible across turns — genuine overlap, not lock-serialised interleaving.
+
+- **Spatial NE survives (`CNE_holds`), in one line.** Because effbound reads only the performer's own bound and its own message-carried context, no concurrent turn can widen them. Turn-locality of the *spatial* guarantee is a fact about the property, not an artifact of the encoding. **This is the foundation a guard is built on, and it is sound under concurrency.**
+- **The temporal invariant does not transfer for free (`CNE_startbound`).** The sequential result "effects stay within the *start-of-run* bound" (T3b) fails under concurrency: only the *current* bound is guaranteed, because a concurrent narrow can intervene between a turn opening and an effect firing. The failure direction is safe (bounds only shrink), but the happens-before order T4's revocation argument relies on is **absent** from the concurrent model.
+
+**The honest boundary of the contribution:** authority confinement (spatial) composes under concurrency; revocation *effectiveness* under concurrency is **open** and requires an explicit happens-before relation not yet in the model. A guard may rely on the former today; the latter is declared future work. (LEDGER L13; CLAIMS T7 / T7-lim.)
+
+### 12.4 Two gaps between this note and the development, named
+- **T4 weak form.** §8 and the development prove the *strong/quiesced* revocation theorem (no-stale-license precondition). The *weak* form — the only effects escaping a narrowed filter are those licensed by messages already in flight — is stated in docstrings but not separately proved. It is the practitioner-relevant form and the next proof obligation.
+- **NE-S chain clause.** §5's NE-S clause (ii), over in-flight messages and live continuations, is **not** mechanized; the development proves the component clause (`mixed_NES`) and the trace property directly. Either prove the clause or mark §5 as note-only. Not a soundness risk — NE-T is proved independently — but a real note↔development discrepancy.
+
 ## Changelog v1.0 → v1.1
 
 - **§8 target theorem replaced.** v1.0's `A1–A4 ⇒ NE` was false; machine-refuted in Lean (`composition_target_unprovable`, commit 8b4e53e). Replaced by T1–T4 over two semantic layers.
