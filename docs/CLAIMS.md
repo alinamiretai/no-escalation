@@ -35,7 +35,7 @@ A CHECKED row is **not** a proved row. Bounded scopes are evidence, not proof. E
 | T4c | Alias-freedom is preserved along membrane-respecting traces | PROVED | `Alias.Step_alias_preserved` → `MStep_alias_preserved` → `alias_free_along` |
 | T4c′ | Same, scope-bounded, under the **repaired** (v1.1) caretaker contract | CHECKED (5/5) | `alias_v11.als`: `AV_AliasPreserved` valid; `AV_SetupSat`/`AV_Live` SAT |
 | T4d | Filters only narrow | PROVED | `Revocation.Step_filter_antitone`, `MStep_filter_antitone` |
-| **T4** | **Revocation effectiveness (strong/quiesced): no underlying-only effect outside F is ever performed** | **PROVED modulo 3 leaf cases** | `Revocation.T4_effectiveness`; open: `NoStaleLicense_preserved` send case, `RevInv_step` startMsg/startRes cases |
+| **T4** | **Revocation effectiveness (strong/quiesced): no underlying-only effect outside F is ever performed** | **PROVED** *(under A6 — see below)* | `Revocation.T4_effectiveness`, via `RevInv_along`; supporting: `NoStaleLicense_preserved`, `RevInv_step`, `IssuedOK` |
 | T5 | Guard and Membrane protect **different** theorems: NE can hold while revocation fails | CHECKED (5) | `alias_v11.als`: `T4_fails_NE_holds` SAT — the reason T4 is not a corollary of monotone filters |
 | T6 | Chain- and history-based access control are **incomparable** | CHECKED (6) | `history_vs_chain.als`: `D3_BothFlag`, `D1_HistoryOverRestricts`, `D2_HistoryMissesDeputy` all SAT |
 
@@ -89,3 +89,4 @@ A CHECKED row is **not** a proved row. Bounded scopes are evidence, not proof. E
 | I1 | For a production tool server, the in-E housekeeping set is **empty** at tool-call granularity — chain-intersection flags nothing legitimate | AUDITED @ `1338dbe` | `instantiation/audit.sh`, `audit-output.txt`, `github-mcp-server-inventory.md` |
 | I2 | Serving-path egress is GitHub-only; no vendor telemetry | AUDITED @ `1338dbe` | audit §5 empty, §9 shows `api.githubcopilot.com` only in docs tooling |
 | I3 | The lockdown cache's cross-tenant isolation is by **convention** (`WithCacheName`), not enforcement | AUDITED @ `1338dbe` | `pkg/lockdown/lockdown.go:186`, `TestRepoAccessCacheIsolatesViewerPerInstance` |
+| I4 | The server originates **no network connections at idle** (zero tool calls, 300 s, per-process) | MEASURED @ `1338dbe` | `instantiation/idle-egress-native.sh`, `idle-egress-capture.txt` — empirical backstop for I2, which grep could only establish structurally |

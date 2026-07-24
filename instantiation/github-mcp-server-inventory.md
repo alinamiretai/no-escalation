@@ -35,7 +35,9 @@
 ## Residuals (honest limits of this audit)
 
 1. **Scope:** local server at one commit; hosted deployment (real metrics sink, GitHub-operated) not audited.
-2. **Dependency I/O** only partially excluded by first-party grep; the recommended empirical backstop — an idle-run egress capture (proxy/tcpdump on the Docker image, zero tool calls) — is **pending** and should precede the paper's instantiation section.
+2. **Dependency I/O — CLOSED empirically.** First-party grep cannot see what dependencies do at runtime, so the claim was backed structurally only. `idle-egress-native.sh` now closes it: a binary built from the audited commit, run on the stdio transport with stdin held open and **zero tool calls**, opened **no network connections over 300 s** (per-process attribution via `lsof -i -a -p <pid>`, sampled every 5 s). Artifact: `idle-egress-capture.txt`.
+   *Bounds of the claim:* 300 s window (a timer with a longer period would be missed); idle only (says nothing about behaviour under load); native build (the published Docker image is a different artifact); local mode only.
+   *Separate observation, not egress:* the **build** fetches ~31 modules from the Go proxy. That is supply-chain surface inherited into the TCB, and it is a different question from whether the running binary phones home — recorded here so the two are not conflated.
 3. `internal/profiler/profiler.go` appears slog-backed; runtime flag-gating unverified.
 4. Single-reader audit (one person + one model); the file:line citations exist so it can be re-derived.
 

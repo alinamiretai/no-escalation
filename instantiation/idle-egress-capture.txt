@@ -1,0 +1,49 @@
+=== provenance ===
+1338dbed4a044ee26422d4212bac3a8037fdb7ff
+matches audited commit
+go version go1.26.5 darwin/arm64
+
+=== build from pinned source ===
+go: downloading github.com/google/jsonschema-go v0.4.3
+go: downloading github.com/spf13/pflag v1.0.10
+go: downloading github.com/spf13/viper v1.21.0
+go: downloading github.com/spf13/cobra v1.10.2
+go: downloading github.com/go-chi/chi/v5 v5.3.1
+go: downloading github.com/modelcontextprotocol/go-sdk v1.7.0-pre.3
+go: downloading github.com/google/go-github/v89 v89.0.0
+go: downloading github.com/shurcooL/githubv4 v0.0.0-20240727222349-48295856cce7
+go: downloading golang.org/x/oauth2 v0.35.0
+go: downloading github.com/muesli/cache2go v0.0.0-20221011235721-518229cd8021
+go: downloading github.com/go-viper/mapstructure/v2 v2.5.0
+go: downloading github.com/yosida95/uritemplate/v3 v3.0.2
+go: downloading github.com/shurcooL/graphql v0.0.0-20230722043721-ed46e5a46466
+go: downloading github.com/fsnotify/fsnotify v1.9.0
+go: downloading github.com/sagikazarmark/locafero v0.11.0
+go: downloading github.com/spf13/afero v1.15.0
+go: downloading github.com/spf13/cast v1.10.0
+go: downloading github.com/microcosm-cc/bluemonday v1.0.27
+go: downloading github.com/google/go-querystring v1.2.0
+go: downloading github.com/subosito/gotenv v1.6.0
+go: downloading github.com/pelletier/go-toml/v2 v2.2.4
+go: downloading go.yaml.in/yaml/v3 v3.0.4
+go: downloading golang.org/x/sync v0.20.0
+go: downloading golang.org/x/time v0.15.0
+go: downloading github.com/segmentio/encoding v0.5.4
+go: downloading golang.org/x/sys v0.45.0
+go: downloading github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8
+go: downloading golang.org/x/text v0.37.0
+go: downloading github.com/aymerick/douceur v0.2.0
+go: downloading golang.org/x/net v0.55.0
+go: downloading github.com/gorilla/css v1.0.1
+go: downloading github.com/segmentio/asm v1.1.3
+-rwxr-xr-x@ 1 alinashah  staff  28085970 Jul 24 10:55 /tmp/ghmcp-audit
+
+=== run idle (stdio transport, stdin held open, no requests sent) ===
+server pid=14693, watching 300s every 5s
+
+=== connection samples ===
+./idle-egress-native.sh: line 80: 14692 Terminated: 15          sleep "$((SECS + 30))" > "$FIFO"
+
+=== summary ===
+NO network connections observed over 300s at idle.
+-> residual #2 CLOSED: the server does not phone home when unused.
