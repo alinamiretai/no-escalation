@@ -150,9 +150,17 @@ Every live theorem of §8 is machine-checked in Lean 4 (Mathlib-free), with one 
 
 **The honest boundary of the contribution:** authority confinement (spatial) composes under concurrency; revocation *effectiveness* under concurrency is **open** and requires an explicit happens-before relation not yet in the model. A guard may rely on the former today; the latter is declared future work. (LEDGER L13; CLAIMS T7 / T7-lim.)
 
-### 12.4 Two gaps between this note and the development, named
-- **T4 weak form.** §8 and the development prove the *strong/quiesced* revocation theorem (no-stale-license precondition). The *weak* form — the only effects escaping a narrowed filter are those licensed by messages already in flight — is stated in docstrings but not separately proved. It is the practitioner-relevant form and the next proof obligation.
-- **NE-S chain clause.** §5's NE-S clause (ii), over in-flight messages and live continuations, is **not** mechanized; the development proves the component clause (`mixed_NES`) and the trace property directly. Either prove the clause or mark §5 as note-only. Not a soundness risk — NE-T is proved independently — but a real note↔development discrepancy.
+### 12.4 Two note↔development gaps — resolved by decision
+
+Both are recorded here with a decision, not left open-ended:
+
+- **T4 weak form — DEFERRED (future work), stated.** The development proves the *strong/quiesced* revocation theorem (no-stale-license precondition). The *weak* form — the only effects escaping a narrowed filter are those licensed by messages already in flight — is the practitioner-relevant version and is stated in docstrings but not separately proved. Decision: it is a declared next proof obligation (paper-two / hardening), not a gap in the current contribution's claims. The current claims are exactly the strong form; nothing here asserts the weak form as proved.
+
+- **NE-S chain clause — note-only, subsumed.** §5's NE-S clause (ii), over in-flight messages and live continuations, is not mechanized. Decision: it is **marked note-only**, because the trace property NE-T (the actual safety guarantee) is proved independently in Lean, and the component clause `mixed_NES` is proved directly. Clause (ii) is an intermediate invariant of one *proof strategy* for NE-T, not a separate guarantee; the Lean reaches NE-T by another route, so the clause is not load-bearing and needs no mechanization. Not a discrepancy in what is guaranteed — only in which intermediate lemmas each artifact uses.
+
+### 12.5 Deliberately deferred (not gaps): result-side mediation
+
+Result-side mediation — the Membrane property applied to what a server returns (a result leaking a capability handle or the underlying reference) — is **deliberately out of scope for this version**, in both the spec (§5.2, §7.2) and the proxy (`pump_inbound` relays results unchanged). This is not an oversight or a loose end: guarding returned values is a distinct design question (what a "result bound" means) of the same character as the concurrency boundary, and belongs to follow-on work. The current contribution guards *outbound* authority; result-side guarding is named future work.
 
 ## Changelog v1.0 → v1.1
 
