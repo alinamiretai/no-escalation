@@ -329,13 +329,26 @@ of a turn opened from a stale message.
 def StaleLicensed (cfg : Config E Comp) (e : E) : Prop :=
   ∃ m : Msg E Comp, cfg.inflight m ∧ S.caretaker m.target ∧ m.stamp e
 
-/-- The weak invariant: the bundle MINUS the stale conjunct. -/
+/-- **Weak issued-clause.** Without quiescence, the open turn's stamp is inside
+`F` OR the whole stamp is one a stale in-flight message could have licensed.
+The disjunct is what `startMsg` needs when `NoStaleLicense` is gone: a turn
+opened from a stale message carries that message's stamp, so we record "the
+issued set is bounded by *some* pending caretaker message's stamp". -/
+def IssuedOKWeak (F : ESet E) (cfg : Config E Comp) : Prop :=
+  ∀ p π, cfg.phase = .active p π → S.caretaker p →
+    ESet.Sub cfg.issued F ∨
+    (∃ m : Msg E Comp, cfg.inflight m ∧ S.caretaker m.target ∧
+       ESet.Sub cfg.issued m.stamp)
+
+/-- The weak invariant: alias + filters + invoked as before, but the issued
+clause carries the stale-escape disjunct. `NoStaleLicense` is dropped. -/
 structure RevInvWeak (F : ESet E) (cfg : Config E Comp) : Prop where
   alias  : Alias.AliasInv S cfg
   filt   : FiltersIn S F cfg
-  issued : IssuedOK S F cfg
+  issued : IssuedOKWeak S F cfg
   invk   : InvokedOK S F cfg
 
+/-- The weak conclusion, per performed effect. -/
 theorem T4_weak {F : ESet E} {cfg : Config E Comp}
     (hinv : RevInvWeak S F cfg) :
     ∀ p π e cfg', FilteredOK S cfg (some (Ev.eff p π e)) →
@@ -343,16 +356,79 @@ theorem T4_weak {F : ESet E} {cfg : Config E Comp}
       UnderlyingOnly S e → F e ∨ StaleLicensed S cfg e := by
   intro p π e cfg' hfilt hs hu
   by_cases hc : S.caretaker p
-  · -- caretaker: T4a puts e in issued; IssuedOK puts issued in F — IF the turn
-    -- was opened legitimately. Without NoStaleLicense we cannot rule out a
-    -- turn opened from a stale in-flight message, so the stamp may sit outside
-    -- F. Here is exactly where the disjunct is needed.
-    have hiss : cfg.issued e := T4a_within_issuance S hfilt hc
-    left
+  · have hiss : cfg.issued e := T4a_within_issuance S hfilt hc
     cases hs with
-    | perform hphase _ => exact hinv.issued p π hphase hc e hiss
-  · -- non-caretaker: impossible by sole-route (alias-freedom, untouched)
-    exact absurd (T4b_sole_route S hinv.alias hu hc hs) (by simp)
+    | perform hphase _ =>
+        rcases hinv.issued p π hphase hc with hF | ⟨m, hm, hmc, hsub⟩
+        · exact Or.inl (hF e hiss)
+        · exact Or.inr ⟨m, hm, hmc, hsub e hiss⟩
+  · exact absurd (T4b_sole_route S hinv.alias hu hc hs) (by simp)
+
+/-- **Weak preservation attempt.** Does `RevInvWeak` survive a step without
+`NoStaleLicense`? The alias/filt/invk conjuncts carry over as in the strong
+proof. The whole question is `IssuedOKWeak`, and within it the `startMsg` case:
+a turn opening from an in-flight message `m` sets `issued := m.stamp` and
+REMOVES `m` from inflight. So post-step there is no pending witness `m` — but
+`issued = m.stamp` holds definitionally, and if `m` was a caretaker message its
+stamp is exactly what the disjunct describes. The question is whether the
+disjunct, requiring a *currently* in-flight witness, can be discharged when the
+witnessing message was just consumed. -/
+theorem RevInvWeak_step {F : ESet E} {cfg ev cfg'}
+    (hs : Step cfg ev cfg')
+    (hmem : Alias.MembraneOK S cfg cfg')
+    (h : RevInvWeak S F cfg) : RevInvWeak S F cfg' := by
+  refine ⟨Alias.Step_alias_preserved S hs hmem h.alias,
+          FiltersIn_preserved S hs h.filt, ?_, ?_⟩
+  · -- IssuedOKWeak
+    intro p π hphase hc
+    cases hs with
+    | startMsg hidle hin =>
+        -- issued' = m.stamp, and m.target = p is a caretaker. But m is no
+        -- longer in flight (consumed). The disjunct needs a pending witness.
+        simp only [Phase.active.injEq] at hphase
+        obtain ⟨hp, _⟩ := hphase
+        subst hp
+        -- HERE: try to witness with m — but m ∉ inflight' now. This is the
+        -- history problem, exhibited. Left as `sorry` to mark the located wall.
+        sorry
+    | startRes _ _ hinvk =>
+        simp only [Phase.active.injEq] at hphase
+        obtain ⟨hp, _⟩ := hphase
+        subst hp
+        left
+        intro e he
+        exact h.invk _ _ hinvk hc e he
+    | invokeRes _ _ => exact h.issued p π hphase hc
+    | perform _ _ => exact h.issued p π hphase hc
+    | send _ _ _ _ _ =>
+        -- send ADDS an in-flight message; an existing witness survives.
+        rcases h.issued p π hphase hc with hF | ⟨m, hm, hmc, hsub⟩
+        · exact Or.inl hF
+        · exact Or.inr ⟨m, Or.inl hm, hmc, hsub⟩
+    | mkRes _ _ _ => exact h.issued p π hphase hc
+    | endTurn _ =>
+        have hcon : Phase.idle = Phase.active p π := hphase
+        simp at hcon
+    | narrow _ => exact h.issued p π hphase hc
+    | narrowFilter _ => exact h.issued p π hphase hc
+  · -- InvokedOK (unchanged from strong proof)
+    intro r σ hinvk hc
+    cases hs with
+    | invokeRes _ _ =>
+        cases hinvk with
+        | inl hold => exact h.invk r σ hold hc
+        | inr hnew =>
+            obtain ⟨hr, hσ⟩ := hnew
+            subst hr; subst hσ
+            exact h.filt _ hc
+    | startRes _ _ _ => exact h.invk r σ hinvk.1 hc
+    | startMsg _ _ => exact h.invk r σ hinvk hc
+    | perform _ _ => exact h.invk r σ hinvk hc
+    | send _ _ _ _ _ => exact h.invk r σ hinvk hc
+    | mkRes _ _ _ => exact h.invk r σ hinvk hc
+    | endTurn _ => exact h.invk r σ hinvk hc
+    | narrow _ => exact h.invk r σ hinvk hc
+    | narrowFilter _ => exact h.invk r σ hinvk hc
 
 end Revocation
 end NoEscalation
