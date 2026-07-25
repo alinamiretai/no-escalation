@@ -55,27 +55,52 @@ class Constraint:
             return isinstance(arg_value, str) and arg_value.startswith(self.value)
         if self.op == "glob":
             return isinstance(arg_value, str) and fnmatch.fnmatch(arg_value, self.value)
+        if self.op == "and":
+            # conjunction: every member must match. Members are Constraints.
+            return all(c.matches(arg_value) for c in self.value)
         raise ValueError(f"unknown op: {self.op}")
 
     def to_json(self):
+        if self.op == "and":
+            return {"and": [c.to_json() for c in self.value]}
         return {self.op: self.value}
 
     @staticmethod
     def from_json(d: dict) -> "Constraint":
         (op, value), = d.items()
+        if op == "and":
+            return Constraint("and", [Constraint.from_json(x) for x in value])
         return Constraint(op, value)
+
+
+def _glob_implies(g1: str, g2: str) -> bool:
+    """Best-effort: does every string matching g1 also match g2? Exact for the
+    cases that arise (equal globs, and one being '*' or a prefix-glob of the
+    other). Conservative — returns False when unsure, which keeps the meet a
+    conjunction rather than dropping a constraint. Sound either way."""
+    if g1 == g2:
+        return True
+    if g2 == "*":
+        return True                     # everything matches '*'
+    # g2 like "prefix*" and g1 starts with that prefix and is itself narrower
+    if g2.endswith("*") and "*" not in g2[:-1]:
+        return g1.startswith(g2[:-1])
+    return False
 
 
 def meet_constraints(a: Constraint, b: Constraint) -> Constraint | None:
     """
     Intersection of two constraints on the same argument, staying in the
-    language. Returns None when the intersection is empty (the argument is
-    then unsatisfiable, so any rule combining them is dropped).
+    language and SOUND (never admits a value outside either input). Returns
+    None when the intersection is provably empty.
 
-    Only the cases needed for the target tools are implemented exactly; mixed
-    operator pairs fall back to a conservative rule (see NOTE). This is the
-    one place where "closed under intersection" is cashed out operationally.
+    Every case is exact. The residue — pairs with no single-constraint
+    representation — is represented as an `and` constraint (satisfy all
+    members), which is the meet expressed faithfully rather than approximated.
+    This is why the operator set is closed under meet: the meet of anything is
+    always "satisfy both", and `and` makes that first-class.
     """
+    # --- eq / in: enumerable, exact ---
     if a.op == "eq" and b.op == "eq":
         return a if a.value == b.value else None
     if a.op == "in" and b.op == "in":
@@ -85,28 +110,57 @@ def meet_constraints(a: Constraint, b: Constraint) -> Constraint | None:
         return a if a.value in b.value else None
     if a.op == "in" and b.op == "eq":
         return b if b.value in a.value else None
+
+    # --- prefix / prefix, prefix / eq: exact ---
     if a.op == "prefix" and b.op == "prefix":
-        # one must extend the other, else disjoint
         if a.value.startswith(b.value):
-            return a
+            return a                    # a is narrower
         if b.value.startswith(a.value):
             return b
-        return None
+        return None                     # incomparable prefixes -> disjoint
     if a.op == "eq" and b.op == "prefix":
         return a if str(a.value).startswith(b.value) else None
     if a.op == "prefix" and b.op == "eq":
         return b if str(b.value).startswith(a.value) else None
-    # NOTE: glob-involving and other mixed pairs are conservatively treated as
-    # "keep the more specific side if it implies the other, else keep both by
-    # returning a — refined per real need." For the target tools, authority
-    # arguments use eq/in/prefix; glob appears on paths only. Left explicit so
-    # the gap is visible rather than silently wrong.
+
+    # --- eq against glob: exact (test the single value) ---
+    if a.op == "eq" and b.op == "glob":
+        return a if b.matches(a.value) else None
+    if a.op == "glob" and b.op == "eq":
+        return b if a.matches(b.value) else None
+
+    # --- in against anything: filter the finite set, exact ---
+    if a.op == "in":
+        kept = [v for v in a.value if b.matches(v)]
+        return Constraint("in", kept) if kept else None
+    if b.op == "in":
+        kept = [v for v in b.value if a.matches(v)]
+        return Constraint("in", kept) if kept else None
+
+    # --- glob / glob and glob / prefix: reduce if one implies the other ---
+    if a.op == "glob" and b.op == "glob":
+        if _glob_implies(a.value, b.value):
+            return a
+        if _glob_implies(b.value, a.value):
+            return b
+        # cannot reduce to one glob -> conjunction (exact, sound)
+        return Constraint("and", [a, b])
+    if {a.op, b.op} == {"glob", "prefix"}:
+        # a prefix p is glob "p*"; reduce via implication, else conjoin
+        g = a if a.op == "glob" else b
+        p = b if a.op == "glob" else a
+        if _glob_implies(f"{p.value}*", g.value):
+            return p                    # prefix is narrower
+        return Constraint("and", [a, b])
+
+    # --- identical constraints ---
     if a.op == b.op and a.value == b.value:
         return a
-    # conservative default: cannot prove non-empty intersection in-language;
-    # keep `a` (tighter checking happens at membership time against both is
-    # not possible here, so we under-approximate by keeping one side). Flagged.
-    return a
+
+    # --- exhaustive residue: represent the meet faithfully as a conjunction ---
+    # This is EXACT (both must hold) and SOUND (admits nothing outside either).
+    # No value is ever silently kept; the guard checks both at membership time.
+    return Constraint("and", [a, b])
 
 
 # --------------------------------------------------------------------------
@@ -290,6 +344,26 @@ if __name__ == "__main__":
     recovered = read_from_meta(msg)
     if recovered is None or recovered.to_json() != chain.to_json():
         fails.append("chain did not round-trip through _meta")
+
+    # --- meet_constraints soundness: the residue is exact, not permissive ---
+    m = meet_constraints(Constraint("glob", "src/*.py"), Constraint("glob", "*/test_*.py"))
+    if m is None or m.matches("src/main.py"):
+        fails.append("glob∩glob should reject src/main.py (fails second glob)")
+    if m is None or not m.matches("src/test_x.py"):
+        fails.append("glob∩glob should admit src/test_x.py (matches both)")
+    if meet_constraints(Constraint("eq", "a/b"), Constraint("glob", "a/*")) is None:
+        fails.append("eq a/b ∩ glob a/* should be a/b")
+    if meet_constraints(Constraint("eq", "x/y"), Constraint("glob", "a/*")) is not None:
+        fails.append("eq x/y ∩ glob a/* should be empty")
+    m = meet_constraints(Constraint("in", ["a/1", "b/2", "a/3"]), Constraint("glob", "a/*"))
+    if m is None or m.op != "in" or set(m.value) != {"a/1", "a/3"}:
+        fails.append("in ∩ glob should filter to a/-prefixed values")
+    m = meet_constraints(Constraint("eq", "evil"), Constraint("glob", "safe/*"))
+    if m is not None and m.matches("evil"):
+        fails.append("REGRESSION: eq(evil) ∩ glob(safe/*) must not admit evil")
+    conj = Constraint("and", [Constraint("glob", "a/*"), Constraint("glob", "*/b")])
+    if Constraint.from_json(conj.to_json()).to_json() != conj.to_json():
+        fails.append("and-constraint did not round-trip through JSON")
 
     print("=" * 50)
     if fails:
