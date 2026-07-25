@@ -310,5 +310,49 @@ theorem T4_effectiveness {F : ESet E} {init : Config E Comp}
   -- CHECK: the `absurd` step turns `False` into anything; if Lean objects,
   -- `exact (T4b_sole_route S hcfg.alias hu hc hs).elim`.
 
+/--
+**T4 weak form (attempt).** The note adopts this: without quiescence
+(`NoStaleLicense`), no underlying-only effect outside `F` is performed EXCEPT
+those licensed by a message already in flight when the filter narrowed.
+
+We state it as a disjunction: `F e ∨ StaleLicensed e`, where `StaleLicensed`
+means some in-flight message at `cfg` carries a stamp admitting `e`. This is
+the honest weak statement — the residual window is named in the conclusion,
+not assumed away in the hypotheses.
+
+EXPERIMENT: the `RevInv` bundle carries `NoStaleLicense`; here we drop it and
+see how far the remaining conjuncts reach. Prediction: the non-caretaker case
+still closes (alias-freedom is untouched), but the caretaker case needs the
+disjunct because `IssuedOK` no longer has `NoStaleLicense` backing the stamp
+of a turn opened from a stale message.
+-/
+def StaleLicensed (cfg : Config E Comp) (e : E) : Prop :=
+  ∃ m : Msg E Comp, cfg.inflight m ∧ S.caretaker m.target ∧ m.stamp e
+
+/-- The weak invariant: the bundle MINUS the stale conjunct. -/
+structure RevInvWeak (F : ESet E) (cfg : Config E Comp) : Prop where
+  alias  : Alias.AliasInv S cfg
+  filt   : FiltersIn S F cfg
+  issued : IssuedOK S F cfg
+  invk   : InvokedOK S F cfg
+
+theorem T4_weak {F : ESet E} {cfg : Config E Comp}
+    (hinv : RevInvWeak S F cfg) :
+    ∀ p π e cfg', FilteredOK S cfg (some (Ev.eff p π e)) →
+      Step cfg (some (Ev.eff p π e)) cfg' →
+      UnderlyingOnly S e → F e ∨ StaleLicensed S cfg e := by
+  intro p π e cfg' hfilt hs hu
+  by_cases hc : S.caretaker p
+  · -- caretaker: T4a puts e in issued; IssuedOK puts issued in F — IF the turn
+    -- was opened legitimately. Without NoStaleLicense we cannot rule out a
+    -- turn opened from a stale in-flight message, so the stamp may sit outside
+    -- F. Here is exactly where the disjunct is needed.
+    have hiss : cfg.issued e := T4a_within_issuance S hfilt hc
+    left
+    cases hs with
+    | perform hphase _ => exact hinv.issued p π hphase hc e hiss
+  · -- non-caretaker: impossible by sole-route (alias-freedom, untouched)
+    exact absurd (T4b_sole_route S hinv.alias hu hc hs) (by simp)
+
 end Revocation
 end NoEscalation
