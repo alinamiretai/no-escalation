@@ -1,6 +1,6 @@
 # no-escalation
 
-A guard that stops AI agents from exceeding the permissions they were delegated — and a machine-checked proof that it holds across delegation chains. Includes a machine-checked property ("no-escalation", NE), mechanized theorems, an adversarial benchmark suite, an instantiation audit of a production tool server, a running MCP guard that enforces the property, and a draft MCP extension specification.
+A guard that stops AI agents from exceeding the permissions they were delegated and a machine-checked proof that it holds across delegation chains.
 
 **The property, in one paragraph.** Fix a set E of effects (tool invocations with arguments). Every message carries an unforgeable *provenance context* π — a chain of (component, sender-chosen bound) pairs, extended at each send and captured/restored by continuations. An effect occurrence by performer p under π is permitted iff it lies in **effbound = B(p) ∩ ⋂{β along π}**. **NE**: every effect occurrence lies within its effbound — a trace safety property (hence exactly monitorable), kept formally distinct from the state-level invariant EA ⊆ B and from the *influence* residue (covert channels, cross-chain intent), which is named and excluded. Attenuation and revocation are one mechanism at different filter values: spatial vs. temporal scoping of conferral.
 
