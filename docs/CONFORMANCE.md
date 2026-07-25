@@ -47,7 +47,7 @@ The rule that keeps this honest: **the spec is the authority; the tool conforms 
 | Spec element | Status | Notes / pointer |
 |---|---|---|
 | stdio, newline-delimited JSON-RPC | IMPLEMENTED | tested against fake_server |
-| `_meta` preserved across a real host | **UNVERIFIED** | SEP-414 guarantees it; the fixture preserves it by construction. **The real-host check (point guard.py at Claude-in-terminal + a real MCP server) is the empirical test still owed.** Until then, "hosts preserve `_meta`" is trusted, not checked. |
+| `_meta` tolerated by a real server | **VERIFIED** | `test_meta_realhost.py`: the official `@modelcontextprotocol/server-filesystem` reference server accepted a `tools/call` carrying `_meta['io.noescalation/provenance']` and completed a `read_file` normally. The design-critical half of SEP-414 (a real server does not reject the key) is confirmed against real code. *Still owed:* end-to-end propagation through a real multi-hop **host** chain — no host originates our key unprompted, so that half awaits guard deployment. |
 | HTTP transport | DEFERRED | stdio only for now |
 
 ---
@@ -56,7 +56,7 @@ The rule that keeps this honest: **the spec is the authority; the tool conforms 
 
 1. **`meet_constraints` mixed pairs (PARTIAL).** The one place the tool is not-yet-correct rather than not-yet-complete. The conservative `return a` fallback for glob-involving pairs. Marked in code. Cheap to finish; needed before the operator set is exercised in full generality.
 
-2. **Real-host `_meta` preservation (UNVERIFIED).** The one empirical claim the tool rests on and hasn't tested. Needs a real MCP host + server (Claude-in-terminal + a real MCP server). Everything else can be checked in the self-contained loop; this cannot.
+2. **Real-host `_meta` — server half VERIFIED** (`test_meta_realhost.py`, reference filesystem server). Remaining: end-to-end host-originated propagation, which awaits guard deployment (no host injects our key unprompted).
 
 3. **Membrane / result guarding (DEFERRED).** `pump_inbound` relays server→host results unchanged; the spec's Membrane clause (never emit the underlying reference in a result) is unenforced. Lower priority — the confinement and composition halves are the core; result-guarding is the next layer.
 
@@ -65,3 +65,14 @@ The rule that keeps this honest: **the spec is the authority; the tool conforms 
 ## What is genuinely done
 
 Confinement AND composition. Single-hop effbound enforcement catches all four benchmark attacks fail-closed (`test_attacks.py`); multi-hop delegation demonstrates T3 — conferral composing down the chain, later narrowing holding against earlier grants (`test_multihop.py`). The wire format round-trips; the `meet` matches the proved definition (Kernel.lean:55) for every case the target tools exercise. This is a reference implementation of the core of the spec — the confinement and composition halves both running and tested. Remaining gaps (mixed-operator meet, real-host `_meta`, result-guarding) are marked above, none in the core path.
+
+---
+
+## Spec-ahead-of-tool (ext-noescalation-spec.md §5, §7)
+
+The extension spec is now drafted (`../ext-noescalation-spec.md`). Two normative clauses lead the reference implementation — expected (specs lead implementations), recorded so the gap is tracked, not silent:
+
+- **§5.5 signing** — the spec REQUIRES signed chains where π crosses a component boundary; the guard uses unsigned chains (sound because the proxy is the sole constructor/consumer — the case §5.5 explicitly permits to omit `sig`). Implementing signing is needed before a multi-guard / cross-boundary deployment conforms.
+- **§5.2 / §7.2 result mediation** — the spec reserves the Membrane property (result-side checking) for a future version; the guard relays results unchanged. Consistent: both spec and tool defer it.
+
+Verified while drafting §5: the `component` field is opaque to the meet (`Kernel.lean:55` discards it; attribution is a separate relation). The spec's claim rests on the source, not on assertion.
