@@ -94,3 +94,25 @@ Not a falsification — a deliberate stress test of the suspicion, raised repeat
 **Why this is the most valuable entry in the file.** Every earlier item was a prose error caught by a checker — real, but definitional in flavour. This is a genuine structural fact about the problem: authority confinement composes under concurrency; revocation effectiveness under concurrency is open and needs explicit ordering. It is the first result that is hard in the way that matters, and it was found by building the adversarial model rather than by trusting the easy one.
 
 **For the paper:** claim NE's concurrency-robustness as a strength; state the temporal-transfer gap as declared future work. Do not paper over it — it is the honest boundary of the current contribution, and stating it is what makes the strength credible.
+
+---
+
+## L14 — Spine audit: four CHECKED rows point at a missing file
+
+A CLAIMS-vs-repo audit (every evidence pointer resolved against the actual files) found that rows **C1, C2, C3, C8** cite assertions "in v3" — `noescalation_v3.als` — which is **not present in `models/`** (only v4, alias_v11, and the specialized files are committed). The named assertions (`B1Sat`, `B1_ChainFlags`, `B2AttackSat`, `HkInRequestFlagged`, `OperatorTurnClean`) do not appear in any current `.als`.
+
+The checks were real during development; the drift is that their evidence file was superseded and not carried forward, so the pointers are now **unreproducible**. CHECKED status with a dangling checker is the "prose ahead of a checker" failure mode (L1–L5) in a new form — a checked claim whose checker walked away.
+
+**Resolution (choose):** (a) restore `noescalation_v3.als` so the pointers resolve; or (b) re-verify the four benchmarks in a current file and repoint, downgrading any not reproduced to STATED. Until resolved, C1/C2/C3/C8 are marked evidence-pending in CLAIMS.
+
+**Lesson:** the spine audit is not ceremony. Every "solidify" needs one, because file consolidation silently orphans pointers even when no claim was ever false. The evidence layer drifts even when the theorem layer doesn't.
+
+### L14 update — C1/C2 resolved, C3/C8 remain
+
+git confirmed outcome 3: no v-series `.als` was ever committed (only one docs-reorg commit touched those paths). The B1/B2/D5/housekeeping checks were run in the Alloy GUI during development against files that never entered git.
+
+**C1/C2 fixed properly:** B1 and B2 re-encoded in `benchmark_attacks.als` (committed). On first run Alloy found **two of eight assertions invalid** — `B1_InvisibleToPerf` (a too-strong set-subset claim; corrected to an existential) and `B2_LegitClean` (a wrong `perfBound` definition using the last hop instead of the performer's own hop). Both were *my* encoding errors, caught by the checker before they could be recorded as CHECKED. After correction, all eight commands green. C1/C2 repointed.
+
+This is L14's own lesson enacted in miniature: re-encoding "from memory" reintroduced the exact prose-ahead-of-checker error, and only running the checker caught it. The file existing was not evidence; the file running green was.
+
+**C3 (D5 continuation-capture) and C8 (item-6 housekeeping) remain evidence-pending** — same treatment needed (re-encode + run, or downgrade to STATED). Not blocking, but not closed.

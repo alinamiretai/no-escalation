@@ -48,16 +48,18 @@ A CHECKED row is **not** a proved row. Bounded scopes are evidence, not proof. E
 
 ## C — Counterexample claims (each forced a definitional decision)
 
+> **L14 resolved.** All four orphaned rows re-encoded in committed, reproducible files and re-run: C1/C2 in `benchmark_attacks.als` (eight checks green), C3/C8 in `benchmark_capture_housekeeping.als`. Across both files the checker caught **three** vacuous or wrong assertions before they could be recorded (B1 too-strong, B2 wrong perfBound, D5_CaptureClean circular) — the discipline working as intended. C3's evidence is `D5_NaiveIsSound` invalid + `D5_RulesDisagree` SAT (real checks); C8's is the SAT witness of turn-kind dependence. No `0-vars` check is recorded as evidence.
+
 | ID | Claim | Status | Evidence | Forced |
 |---|---|---|---|---|
-| C1 | Performer-only attribution certifies the confused deputy | CHECKED (6) | v3 `B1_InvisibleToPerf` valid *(validity is the indictment)*; `B1_ChainFlags` valid; `B1Sat` SAT | chain attribution |
-| C2 | Component bounds alone hide re-amplification | CHECKED (6) | v3 `B2_InvisibleToPerf` valid; `B2_AttachedFlags` valid; `B2_LegitClean` valid; `B2AttackSat`/`B2LegitSat` SAT | attached bounds |
-| C3 | Naive reply semantics flags legitimate resumption | CHECKED (8) | v3 `D5_NaiveAlwaysFlags` valid *(indictment)*; `D5_CaptureClean` valid; `D5_NaiveInstance` SAT | continuation capture |
+| C1 | Performer-only attribution certifies the confused deputy | CHECKED (6) | `benchmark_attacks.als` `B1_InvisibleToPerf` valid *(validity is the indictment)*; `B1_ChainFlags` valid; `B1Sat` SAT — **re-encoded & re-run green (L14 fix)** | chain attribution |
+| C2 | Component bounds alone hide re-amplification | CHECKED (6) | `benchmark_attacks.als` `B2_InvisibleToPerf` valid; `B2_AttachedFlags` valid; `B2_LegitClean` valid; `B2AttackSat`/`B2LegitSat` SAT — **re-encoded & re-run green (L14 fix)** | attached bounds |
+| C3 | Naive reply semantics flags legitimate resumption | CHECKED (6) | `benchmark_capture_housekeeping.als` `D5_NaiveIsSound` **invalid** *(the false positive — invalidity is the indictment; 4078 vars, a real check)* + `D5_RulesDisagree` SAT *(naive flags what capture clears)*. Together these are the claim; the circular `D5_CaptureClean` was dropped as vacuous (0 vars). **Re-encoded & re-run (L14 fix)** | continuation capture |
 | C4 | **The v1.0 caretaker contract admits a confused deputy** — found inside our own design | REFUTED-v1.0 / CHECKED (8) | `caretaker_finding.als` `V10_prevents_escalation` invalid; un-scripted in `noescalation_v4.als` `V10_admits_escalation` invalid | caretaker Guard clause (v1.1) |
 | C5 | Creation-turn issuance readmits stale-capability bypass at the continuation level | CHECKED (8) | `resolver_issuance.als`: `C1_creation_admits_bypass` SAT; `C2_invoker_blocks_bypass` UNSAT; `C3_invoker_not_overblocking` SAT | invoker-turn issuance |
 | C6 | The v1.1 repair closes C4 without blocking legitimate delegation | CHECKED (8) | v4 `V11_prevents_escalation` valid + `CareRepairedSat` SAT; `Legit_clean` valid + `LegitSat` SAT; `Chain_*`, `Resolver_*` SAT+valid | — |
 | C7 | Guarded perform does not over-block | CHECKED (6) | v4 `GuardedCleanSat` SAT, `GuardedClean_ok` valid | — |
-| C8 | Item 6: request-turn housekeeping is a true positive; operator-turn housekeeping is clean | CHECKED (8) | v3 `HkInRequestFlagged` valid, `OperatorTurnClean` valid, both witnessed | sub-effect principle |
+| C8 | Item 6: request-turn housekeeping is a true positive; operator-turn housekeeping is clean | CHECKED-SAT (6) | `benchmark_capture_housekeeping.als` `HkRequestFlaggedOperatorClean` SAT + `HkRequestSat`/`HkOperatorSat` SAT — the turn-kind dependence is *witnessed* (the honest evidence for C8 is the inhabited instance, not a valid check). **Re-encoded & re-run (L14 fix)** | sub-effect principle |
 
 ---
 
