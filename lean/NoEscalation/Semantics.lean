@@ -65,6 +65,13 @@ structure Config (E : Type u) (Comp : Type v) : Type (max u v) where
   /-- Resolvers that have been invoked, paired with the stamp taken at the
   moment of invocation (invoker-turn licensing). -/
   invoked  : Res E Comp → ESet E → Prop
+  /-- T4-weak: the accumulated union of stamps of caretaker messages that have
+  been CONSUMED by `startMsg`. Grows monotonically. This is the issuance
+  history the weak revocation form needs: when a turn opens from an in-flight
+  message and that message leaves the in-flight set, its licensing stamp is
+  retained here so the weak-invariant disjunct still has a witness. Irrelevant
+  to the strong (quiesced) form, which never has stale messages. -/
+  issuedHistory : ESet E
 
 /-- Observable events: effect occurrences with performer and context. -/
 inductive Ev (E : Type u) (Comp : Type v) : Type (max u v) where
@@ -85,6 +92,7 @@ inductive Step : Config E Comp → Option (Ev E Comp) → Config E Comp → Prop
           phase    := .active m.target m.ctx
           issued   := m.stamp                         -- T4/D2
           inflight := fun m' => cfg.inflight m' ∧ m' ≠ m
+          issuedHistory := fun e => cfg.issuedHistory e ∨ m.stamp e  -- T4-weak: retain consumed stamp
           store    := fun c k => cfg.store c k ∨ (c = m.target ∧ m.payload k) }
   | startRes {cfg : Config E Comp} {r : Res E Comp} {σ : ESet E} :
       cfg.phase = .idle → cfg.live r → cfg.invoked r σ →

@@ -63,7 +63,8 @@ def init : Config Ef Cp :=
     phase    := .idle
     filters  := fun _ _ => True
     issued   := fun _ => True
-    invoked  := fun _ _ => False }
+    invoked  := fun _ _ => False
+    issuedHistory := fun _ => False }
 
 /-- The caretaker's turn, opened from the pending request. -/
 def cfg₁ : Config Ef Cp :=
@@ -71,6 +72,7 @@ def cfg₁ : Config Ef Cp :=
     phase    := .active Cp.care π₀
     issued   := m₀.stamp
     inflight := fun m => init.inflight m ∧ m ≠ m₀
+    issuedHistory := fun e => init.issuedHistory e ∨ m₀.stamp e
     store    := fun c k => init.store c k ∨ (c = m₀.target ∧ m₀.payload k) }
 
 theorem opens : Step init none cfg₁ := Step.startMsg rfl rfl

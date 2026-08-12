@@ -60,7 +60,8 @@ def init : Config Ef Cp :=
     phase    := .idle
     filters  := fun _ _ => True
     issued   := fun _ => True
-    invoked  := fun _ _ => False }
+    invoked  := fun _ _ => False
+    issuedHistory := fun _ => False }
 
 /-- Deliver m₀: bob's turn opens under alice's narrow context.
 Trace is [] (delivery is silent). -/

@@ -327,52 +327,47 @@ disjunct because `IssuedOK` no longer has `NoStaleLicense` backing the stamp
 of a turn opened from a stale message.
 -/
 def StaleLicensed (cfg : Config E Comp) (e : E) : Prop :=
-  ∃ m : Msg E Comp, cfg.inflight m ∧ S.caretaker m.target ∧ m.stamp e
+  cfg.issuedHistory e
 
-/-- **Weak issued-clause.** Without quiescence, the open turn's stamp is inside
-`F` OR the whole stamp is one a stale in-flight message could have licensed.
-The disjunct is what `startMsg` needs when `NoStaleLicense` is gone: a turn
-opened from a stale message carries that message's stamp, so we record "the
-issued set is bounded by *some* pending caretaker message's stamp". -/
+/-- **Weak issued-clause.** The open turn's stamp is inside `F` OR inside the
+issuance history — the accumulated stamps of consumed caretaker messages.
+Witnessing against history (not current inflight) is what makes this
+preservable: `startMsg` moves a consumed message's stamp into `issuedHistory`,
+so the disjunct keeps a witness after the message leaves the in-flight set. -/
 def IssuedOKWeak (F : ESet E) (cfg : Config E Comp) : Prop :=
   ∀ p π, cfg.phase = .active p π → S.caretaker p →
-    ESet.Sub cfg.issued F ∨
-    (∃ m : Msg E Comp, cfg.inflight m ∧ S.caretaker m.target ∧
-       ESet.Sub cfg.issued m.stamp)
+    ESet.Sub cfg.issued F ∨ ESet.Sub cfg.issued cfg.issuedHistory
 
-/-- The weak invariant: alias + filters + invoked as before, but the issued
-clause carries the stale-escape disjunct. `NoStaleLicense` is dropped. -/
+/-- The weak invariant: alias + filters + invoked as before; the issued clause
+carries the history disjunct. `NoStaleLicense` is dropped. -/
 structure RevInvWeak (F : ESet E) (cfg : Config E Comp) : Prop where
   alias  : Alias.AliasInv S cfg
   filt   : FiltersIn S F cfg
   issued : IssuedOKWeak S F cfg
   invk   : InvokedOK S F cfg
 
-/-- The weak conclusion, per performed effect. -/
+/-- Weak per-step conclusion: within `F`, or licensed by the issuance history. -/
 theorem T4_weak {F : ESet E} {cfg : Config E Comp}
     (hinv : RevInvWeak S F cfg) :
     ∀ p π e cfg', FilteredOK S cfg (some (Ev.eff p π e)) →
       Step cfg (some (Ev.eff p π e)) cfg' →
-      UnderlyingOnly S e → F e ∨ StaleLicensed S cfg e := by
+      UnderlyingOnly S e → F e ∨ StaleLicensed cfg e := by
   intro p π e cfg' hfilt hs hu
   by_cases hc : S.caretaker p
   · have hiss : cfg.issued e := T4a_within_issuance S hfilt hc
     cases hs with
     | perform hphase _ =>
-        rcases hinv.issued p π hphase hc with hF | ⟨m, hm, hmc, hsub⟩
+        rcases hinv.issued p π hphase hc with hF | hH
         · exact Or.inl (hF e hiss)
-        · exact Or.inr ⟨m, hm, hmc, hsub e hiss⟩
+        · exact Or.inr (hH e hiss)
   · exact absurd (T4b_sole_route S hinv.alias hu hc hs) (by simp)
 
-/-- **Weak preservation attempt.** Does `RevInvWeak` survive a step without
-`NoStaleLicense`? The alias/filt/invk conjuncts carry over as in the strong
-proof. The whole question is `IssuedOKWeak`, and within it the `startMsg` case:
-a turn opening from an in-flight message `m` sets `issued := m.stamp` and
-REMOVES `m` from inflight. So post-step there is no pending witness `m` — but
-`issued = m.stamp` holds definitionally, and if `m` was a caretaker message its
-stamp is exactly what the disjunct describes. The question is whether the
-disjunct, requiring a *currently* in-flight witness, can be discharged when the
-witnessing message was just consumed. -/
+/-- **Weak preservation.** `RevInvWeak` survives every step. The `startMsg`
+case — which broke the naive attempt because it consumes its witnessing
+message — now closes: `startMsg` sets `issued := m.stamp` AND accumulates
+`m.stamp` into `issuedHistory`, so the history disjunct is discharged by
+`subset_union_right`. The field was designed to hold exactly what the consumed
+message leaves behind. -/
 theorem RevInvWeak_step {F : ESet E} {cfg ev cfg'}
     (hs : Step cfg ev cfg')
     (hmem : Alias.MembraneOK S cfg cfg')
@@ -383,14 +378,12 @@ theorem RevInvWeak_step {F : ESet E} {cfg ev cfg'}
     intro p π hphase hc
     cases hs with
     | startMsg hidle hin =>
-        -- issued' = m.stamp, and m.target = p is a caretaker. But m is no
-        -- longer in flight (consumed). The disjunct needs a pending witness.
-        simp only [Phase.active.injEq] at hphase
-        obtain ⟨hp, _⟩ := hphase
-        subst hp
-        -- HERE: try to witness with m — but m ∉ inflight' now. This is the
-        -- history problem, exhibited. Left as `sorry` to mark the located wall.
-        sorry
+        -- issued' = m.stamp, and issuedHistory' = old ∨ m.stamp. So issued' is
+        -- a subset of issuedHistory' by the right injection: the history
+        -- disjunct closes exactly because startMsg just recorded m.stamp.
+        right
+        intro e he
+        exact Or.inr he
     | startRes _ _ hinvk =>
         simp only [Phase.active.injEq] at hphase
         obtain ⟨hp, _⟩ := hphase
@@ -400,11 +393,7 @@ theorem RevInvWeak_step {F : ESet E} {cfg ev cfg'}
         exact h.invk _ _ hinvk hc e he
     | invokeRes _ _ => exact h.issued p π hphase hc
     | perform _ _ => exact h.issued p π hphase hc
-    | send _ _ _ _ _ =>
-        -- send ADDS an in-flight message; an existing witness survives.
-        rcases h.issued p π hphase hc with hF | ⟨m, hm, hmc, hsub⟩
-        · exact Or.inl hF
-        · exact Or.inr ⟨m, Or.inl hm, hmc, hsub⟩
+    | send _ _ _ _ _ => exact h.issued p π hphase hc
     | mkRes _ _ _ => exact h.issued p π hphase hc
     | endTurn _ =>
         have hcon : Phase.idle = Phase.active p π := hphase
@@ -429,6 +418,45 @@ theorem RevInvWeak_step {F : ESet E} {cfg ev cfg'}
     | endTurn _ => exact h.invk r σ hinvk hc
     | narrow _ => exact h.invk r σ hinvk hc
     | narrowFilter _ => exact h.invk r σ hinvk hc
+
+/-- Weak bundle survives a multi-step (mirrors `RevInv_mstep`). -/
+theorem RevInvWeak_mstep {F : ESet E} {cfg ev cfg'}
+    (hs : Guarded.MStep S.toSystem cfg ev cfg')
+    (hmem : Alias.MembraneOK S cfg cfg')
+    (h : RevInvWeak S F cfg) : RevInvWeak S F cfg' := by
+  cases hs with
+  | untrusted hg _ => cases hg with
+    | lift hstep _ => exact RevInvWeak_step S hstep hmem h
+  | trusted hstep _ => exact RevInvWeak_step S hstep hmem h
+
+/-- The weak bundle survives a whole trace (mirrors `RevInv_along`). -/
+theorem RevInvWeak_along {F : ESet E} {init : Config E Comp}
+    (h : RevInvWeak S F init) :
+    ∀ tr cfg, RevTrace S F init tr cfg → RevInvWeak S F cfg := by
+  intro tr cfg hr
+  induction hr with
+  | refl _ => exact h
+  | step hstep hmem _ _ ih => exact ih (RevInvWeak_mstep S hstep hmem h)
+
+/--
+**T4 weak form (trace theorem).** Given the weak invariant at `init` (no
+quiescence), along every membrane- and filter-respecting trace, every
+underlying-only effect is inside `F` OR licensed by the issuance history — the
+accumulated stamps of consumed caretaker messages. Revocation is effective
+except for effects whose license was already issued into history before the
+narrowing; the residual is bounded by actually-issued licenses, never
+arbitrary. (Broader than "in flight at narrow-time" — it is "ever issued into
+history" — the price of a config-level invariant.)
+-/
+theorem T4_weak_trace {F : ESet E} {init : Config E Comp}
+    (h : RevInvWeak S F init) :
+    ∀ tr cfg, RevTrace S F init tr cfg →
+      ∀ p π e cfg', FilteredOK S cfg (some (Ev.eff p π e)) →
+        Step cfg (some (Ev.eff p π e)) cfg' →
+        UnderlyingOnly S e → F e ∨ StaleLicensed cfg e := by
+  intro tr cfg hr p π e cfg' hfilt hs hu
+  exact T4_weak S (RevInvWeak_along S h tr cfg hr) p π e cfg' hfilt hs hu
+
 
 end Revocation
 end NoEscalation

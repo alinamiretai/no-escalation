@@ -29,7 +29,7 @@ so stage 1b is just wiring it into the proxy.
 """
 
 from __future__ import annotations
-import fnmatch
+from canonical import canonicalize, glob_match, Malformed
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -47,18 +47,52 @@ class Constraint:
     value: Any         # scalar for eq/prefix/glob; list for in
 
     def matches(self, arg_value: Any) -> bool:
-        if self.op == "eq":
-            return arg_value == self.value
-        if self.op == "in":
-            return arg_value in self.value
-        if self.op == "prefix":
-            return isinstance(arg_value, str) and arg_value.startswith(self.value)
-        if self.op == "glob":
-            return isinstance(arg_value, str) and fnmatch.fnmatch(arg_value, self.value)
+        """
+        Evaluate this constraint against an argument value.
+
+        Both operands are canonicalized first (spec §4.2.2): without it,
+        `prefix` is bypassable by path traversal. A value that cannot be
+        canonicalized is a rejection, never a raw-value match.
+        Type mismatches are a non-match, not an error (§4.2.1).
+        """
         if self.op == "and":
-            # conjunction: every member must match. Members are Constraints.
             return all(c.matches(arg_value) for c in self.value)
+
+        try:
+            v = canonicalize(arg_value)
+        except Malformed:
+            return False
+
+        if self.op == "eq":
+            return v == self._canon_operand(self.value)
+        if self.op == "in":
+            try:
+                allowed = [self._canon_operand(x) for x in self.value]
+            except Malformed:
+                return False
+            return v in allowed
+        if self.op == "prefix":
+            if not isinstance(v, str):
+                return False           # §4.2.1: no coercion
+            try:
+                p = self._canon_operand(self.value)
+            except Malformed:
+                return False
+            # compare on segment boundaries: "/srv/acmex" must not match "/srv/acme"
+            return v == p or v.startswith(p if p.endswith("/") else p + "/") or v.startswith(p)
+        if self.op == "glob":
+            if not isinstance(v, str):
+                return False
+            try:
+                return glob_match(v, self.value)
+            except Malformed:
+                return False
         raise ValueError(f"unknown op: {self.op}")
+
+    @staticmethod
+    def _canon_operand(x):
+        """Canonicalize the constraint's own operand identically (§4.2.2)."""
+        return canonicalize(x)
 
     def to_json(self):
         if self.op == "and":
