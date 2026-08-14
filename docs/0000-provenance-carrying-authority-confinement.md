@@ -12,7 +12,7 @@
 
 This extension adds a provenance record to tools/call, carried in _meta under io.noescalation/provenance. The record is the delegation chain: one entry per hop, each naming the delegating component and the bound it conferred. A guard on the call path admits the call only if it falls within the intersection of every bound along the chain — so a narrowing at any hop binds every hop after it, and no component can confer authority it does not hold.
 
-' The extension specifies the provenance object, a constraint language for bounds closed under intersection, the meet operation, and the processing rules a conforming guard follows. '
+The extension specifies the provenance object, a constraint language for bounds closed under intersection, the meet operation, and the processing rules a conforming guard follows.
 
 It is additive and opt-in: participants that do not implement it ignore the key and are unaffected.
 
